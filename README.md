@@ -33,4 +33,10 @@ pnpm dev
 4. prodection
 ```sh
 cp .env.production.sample .env.production
+
+pnpm install
+
+pnpm run build
+
+pnpm run start
 ```
