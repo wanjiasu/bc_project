@@ -5,6 +5,28 @@ const globalForDb = globalThis as typeof globalThis & {
   __authDbPool?: Pool | null
 }
 
+const debugEnabled =
+  (process.env.POSTGRES_DEBUG ?? "").toLowerCase() === "true" ||
+  process.env.NODE_ENV === "development"
+
+const debugLog = (...args: unknown[]) => {
+  if (debugEnabled) {
+    console.log("[postgres]", ...args)
+  }
+}
+
+const maskConnectionString = (connectionString: string) => {
+  try {
+    const url = new URL(connectionString)
+    if (url.password) {
+      url.password = "***"
+    }
+    return url.toString()
+  } catch {
+    return connectionString.replace(/(postgres(?:ql)?:\/\/[\w.-]+:)([^@]+)(@)/i, "$1***$3")
+  }
+}
+
 let pool: Pool | null = null
 let tableEnsured = false
 let hasLoggedConnectionError = false
@@ -25,6 +47,7 @@ function getConnectionString(): string | null {
 function getPool(): Pool | null {
   if (pool) return pool
   if (globalForDb.__authDbPool) {
+    debugLog("Reusing cached connection pool")
     pool = globalForDb.__authDbPool
     return pool
   }
@@ -32,6 +55,7 @@ function getPool(): Pool | null {
   const connectionString = getConnectionString()
 
   if (!connectionString) {
+    debugLog("No PostgreSQL connection string found. Skipping pool creation.")
     return null
   }
 
@@ -56,6 +80,16 @@ function getPool(): Pool | null {
     keepAlive: true,
   })
 
+  debugLog(
+    "Created new connection pool",
+    maskConnectionString(connectionString),
+    {
+      ssl: shouldUseSSL,
+      connectionTimeoutMillis: process.env.POSTGRES_CONNECTION_TIMEOUT ?? 5000,
+      idleTimeoutMillis: process.env.POSTGRES_IDLE_TIMEOUT ?? 10000,
+    }
+  )
+
   globalForDb.__authDbPool = pool
 
   return pool
@@ -79,7 +113,9 @@ async function ensureTableExists(client: Pool) {
     );
   `
 
+  debugLog("Ensuring auth_signins table exists")
   await client.query(createTableSQL)
+  debugLog("auth_signins table ensured")
   tableEnsured = true
 }
 
@@ -105,6 +141,13 @@ export async function recordSignInEvent({
   }
 
   try {
+    debugLog("Recording sign-in", {
+      userId: user?.id,
+      email: user?.email,
+      provider: account?.provider,
+      providerAccountId: account?.providerAccountId,
+      isNewUser,
+    })
     await ensureTableExists(db)
 
     const query = `
@@ -133,10 +176,14 @@ export async function recordSignInEvent({
     ])
 
     hasLoggedConnectionError = false
+    debugLog("Sign-in record stored successfully")
   } catch (error) {
-    if (!hasLoggedConnectionError) {
+    const shouldLog = debugEnabled || !hasLoggedConnectionError
+    if (shouldLog) {
       console.error("Failed to record sign-in audit", error)
-      hasLoggedConnectionError = true
+      if (!debugEnabled) {
+        hasLoggedConnectionError = true
+      }
     }
   }
 }
