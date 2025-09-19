@@ -1,7 +1,16 @@
 import NextAuth from "next-auth"
-import Facebook from "next-auth/providers/github"
+import Facebook from "next-auth/providers/facebook"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
+
+const authSecret =
+  process.env.AUTH_SECRET ??
+  process.env.NEXTAUTH_SECRET ??
+  process.env.NEXT_AUTH_SECRET
+
+if (!authSecret) {
+  throw new Error("Missing Auth secret. Set AUTH_SECRET in your environment.")
+}
 
 export const { auth, handlers } = NextAuth({
   providers: [
@@ -18,5 +27,5 @@ export const { auth, handlers } = NextAuth({
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? "",
     }),
   ],
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: authSecret,
 })
