@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmartBet Hub · 轻量站 MVP</title>
+  <meta name="description" content="下注之前，先看 AI 怎么说——AI 预测、赔率对比、羊毛福利聚合的一站式入口。">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bg1': '#0b1220',
+            'bg2': '#0e1626',
+          },
+          boxShadow: {
+            soft: '0 8px 30px rgba(0,0,0,.25)'
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .glass { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+    .chip { background: rgba(255,255,255,.08); }
+    .grad-text { background: linear-gradient(90deg,#818cf8,#67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 bg-gradient-to-b from-bg1 via-bg2 to-bg1">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-bg1/70 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 grid place-items-center font-black">AI</div>
+        <div class="font-semibold">SmartBet Hub</div>
+        <span class="text-xs px-2 py-0.5 rounded chip ml-2 hidden sm:inline">MVP</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-white/70">
+        <a href="#ai" class="hover:text-white">AI 预测</a>
+        <a href="#odds" class="hover:text-white">赔率对比</a>
+        <a href="#promos" class="hover:text-white">羊毛中心</a>
+        <a href="#scores" class="hover:text-white">比分&赛程</a>
+        <a href="#social" class="hover:text-white">加入社群</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button class="hidden sm:inline-flex rounded-xl px-4 py-2 text-sm glass">登录</button>
+        <button class="rounded-xl px-4 py-2 text-sm bg-white text-bg1 font-semibold">免费使用</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at top, rgba(99,102,241,.25), transparent 60%);"></div>
+    <div class="relative max-w-7xl mx-auto px-4 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">
+          下注之前，先看 <span class="grad-text">AI 怎么说</span>
+        </h1>
+        <p class="mt-4 text-white/70 max-w-xl">
+          一站式 <b>AI 预测</b>、<b>赔率对比</b> 与 <b>羊毛福利</b> 聚合。东南亚 & 南美玩家的智能下注第一入口。
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="#ai" class="rounded-xl px-4 py-2 text-sm bg-white text-bg1 font-semibold inline-flex items-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4"></i> 立即查看今日 AI Picks
+          </a>
+          <a href="#promos" class="rounded-xl px-4 py-2 text-sm glass inline-flex items-center gap-2">
+            <i data-lucide="percent" class="w-4 h-4"></i> 进入羊毛中心
+          </a>
+        </div>
+        <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-xl chip"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
+            <div>
+              <div class="text-xs opacity-70">近7日命中率*</div>
+              <div class="text-base font-semibold">63%</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-xl chip"><i data-lucide="users" class="w-5 h-5"></i></div>
+            <div>
+              <div class="text-xs opacity-70">私域用户</div>
+              <div class="text-base font-semibold">3,214</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-xl chip"><i data-lucide="crown" class="w-5 h-5"></i></div>
+            <div>
+              <div class="text-xs opacity-70">覆盖渠道</div>
+              <div class="text-base font-semibold">8+</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-xl chip"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+            <div>
+              <div class="text-xs opacity-70">风控模型</div>
+              <div class="text-base font-semibold">Beta</div>
+            </div>
+          </div>
+        </div>
+        <p class="text-[11px] text-white/40 mt-2">*示例数据，仅作展示</p>
+      </div>
+
+      <!-- AI Pick Card -->
+      <div id="ai" class="glass rounded-2xl shadow-soft p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            <span class="text-sm opacity-80">今日 AI 重点</span>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300">信心 87%</span>
+        </div>
+        <h3 class="text-xl font-bold mb-1">Liverpool vs. Man United</h3>
+        <div class="text-sm text-white/60 mb-4">开赛时间：22:00 GMT+7</div>
+
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <div class="rounded-xl chip p-3 text-center">
+            <div class="text-xs opacity-60">主胜</div>
+            <div class="text-2xl font-bold">62%</div>
+          </div>
+          <div class="rounded-xl chip p-3 text-center">
+            <div class="text-xs opacity-60">平局</div>
+            <div class="text-2xl font-bold">21%</div>
+          </div>
+          <div class="rounded-xl chip p-3 text-center">
+            <div class="text-xs opacity-60">客胜</div>
+            <div class="text-2xl font-bold">17%</div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-indigo-400/20 p-4" style="background: rgba(99,102,241,.12)">
+          <div class="text-xs opacity-70">推荐盘口 · FT 1X2</div>
+          <div class="text-lg font-semibold mt-1">Home</div>
+          <p class="text-sm text-white/70 mt-2">AI 参考近期 xG（2.1 vs 1.2）与高压迫抢回率。市场高估德比波动；主胜具备价值。</p>
+        </div>
+
+        <div class="mt-5 flex gap-3">
+          <a href="#ai" class="rounded-xl px-4 py-2 text-sm bg-white text-bg1 font-semibold inline-flex items-center gap-2">
+            <i data-lucide="star" class="w-4 h-4"></i> 更多 AI Picks
+          </a>
+          <a href="#ai" class="rounded-xl px-4 py-2 text-sm glass inline-flex items-center gap-2">
+            <i data-lucide="line-chart" class="w-4 h-4"></i> 历史命中
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Odds Comparator -->
+  <section id="odds" class="max-w-7xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+        <i data-lucide="line-chart" class="w-5 h-5"></i> 赔率对比（示例）
+      </h2>
+      <div class="hidden md:flex items-center gap-2">
+        <input placeholder="搜索赛事 / 联赛" class="glass rounded-xl px-3 py-2 text-sm outline-none" />
+        <button class="rounded-xl px-4 py-2 text-sm bg-white text-bg1 font-semibold">搜索</button>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card -->
+      <div class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><i data-lucide="globe-2" class="w-4 h-4"></i><span class="font-semibold">GG.bet</span></div>
+          <span class="text-xs px-2 py-1 rounded-full chip">100% up to $100</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">主胜</div><div class="font-bold">1.78</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">平局</div><div class="font-bold">3.90</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">客胜</div><div class="font-bold">4.40</div></div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block bg-white text-bg1 font-semibold inline-flex items-center justify-center gap-2">通过我们去下注 <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><i data-lucide="globe-2" class="w-4 h-4"></i><span class="font-semibold">1xBet</span></div>
+          <span class="text-xs px-2 py-1 rounded-full chip">$30 free bet</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">主胜</div><div class="font-bold">1.80</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">平局</div><div class="font-bold">3.85</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">客胜</div><div class="font-bold">4.35</div></div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block bg-white text-bg1 font-semibold inline-flex items-center justify-center gap-2">通过我们去下注 <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><i data-lucide="globe-2" class="w-4 h-4"></i><span class="font-semibold">Parimatch</span></div>
+          <span class="text-xs px-2 py-1 rounded-full chip">10% cashback</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">主胜</div><div class="font-bold">1.76</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">平局</div><div class="font-bold">3.95</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">客胜</div><div class="font-bold">4.50</div></div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block bg-white text-bg1 font-semibold inline-flex items-center justify-center gap-2">通过我们去下注 <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2"><i data-lucide="globe-2" class="w-4 h-4"></i><span class="font-semibold">Thunderpick</span></div>
+          <span class="text-xs px-2 py-1 rounded-full chip">Crypto bonus +10%</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">主胜</div><div class="font-bold">1.79</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">平局</div><div class="font-bold">3.88</div></div>
+          <div class="rounded-xl chip p-3"><div class="text-[10px] opacity-60">客胜</div><div class="font-bold">4.42</div></div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block bg-white text-bg1 font-semibold inline-flex items-center justify-center gap-2">通过我们去下注 <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promotions -->
+  <section id="promos" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="ticket" class="w-5 h-5"></i> 羊毛中心 · 今日福利</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="rounded-2xl glass p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs px-2 py-1 rounded chip">Esports</span>
+          <span class="text-sm opacity-80 font-semibold">GG.bet</span>
+        </div>
+        <div class="mt-3 text-lg font-bold">100% 首充加赠</div>
+        <p class="text-sm text-white/70 mt-1">注册即享，电竞专属</p>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">领取</a>
+      </div>
+
+      <div class="rounded-2xl glass p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs px-2 py-1 rounded chip">Football</span>
+          <span class="text-sm opacity-80 font-semibold">1xBet</span>
+        </div>
+        <div class="mt-3 text-lg font-bold">$30 免费注单</div>
+        <p class="text-sm text-white/70 mt-1">新客福利，支持串关</p>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">领取</a>
+      </div>
+
+      <div class="rounded-2xl glass p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs px-2 py-1 rounded chip">All Sports</span>
+          <span class="text-sm opacity-80 font-semibold">Parimatch</span>
+        </div>
+        <div class="mt-3 text-lg font-bold">10% 现金返还</div>
+        <p class="text-sm text-white/70 mt-1">周赛累计返利</p>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">参加</a>
+      </div>
+
+      <div class="rounded-2xl glass p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs px-2 py-1 rounded chip">Crypto</span>
+          <span class="text-sm opacity-80 font-semibold">Thunderpick</span>
+        </div>
+        <div class="mt-3 text-lg font-bold">+10% 加密充值</div>
+        <p class="text-sm text-white/70 mt-1">USDT/ETH 即时到账</p>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">充值</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scores -->
+  <section id="scores" class="max-w-7xl mx-auto px-4 py-10">
+    <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5"></i> 实时比分 & 赛程</h2>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="glass rounded-2xl p-5">
+        <div class="text-xs opacity-70 mb-2">THA League 1</div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-semibold">Buriram Utd</div>
+            <div class="font-semibold">BG Pathum</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm opacity-70">LIVE 31'</div>
+            <div class="text-xl font-bold">1 - 0</div>
+            <div class="text-xs opacity-60 mt-1">19:00</div>
+          </div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">查看盘口</a>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="text-xs opacity-70 mb-2">Brazil Serie A</div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-semibold">Flamengo</div>
+            <div class="font-semibold">Palmeiras</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm opacity-70">Today</div>
+            <div class="text-xl font-bold">-</div>
+            <div class="text-xs opacity-60 mt-1">07:30</div>
+          </div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">查看盘口</a>
+      </div>
+
+      <div class="glass rounded-2xl p-5">
+        <div class="text-xs opacity-70 mb-2">LoL LLA</div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-semibold">INF</div>
+            <div class="font-semibold">EST</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm opacity-70">Bo5</div>
+            <div class="text-xl font-bold">-</div>
+            <div class="text-xs opacity-60 mt-1">17:00</div>
+          </div>
+        </div>
+        <a href="#" class="w-full mt-4 rounded-xl px-4 py-2 text-center block glass">查看盘口</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social / Agents -->
+  <section id="social" class="max-w-7xl mx-auto px-4 py-12">
+    <div class="glass rounded-2xl p-6 md:p-8 grid lg:grid-cols-2 gap-6 items-center">
+      <div>
+        <h3 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="link" class="w-5 h-5"></i> 加入社群 & 代理计划</h3>
+        <p class="text-white/70 mt-2">Line / Telegram / WhatsApp 一键加入，获取每日 AI 预测与独家福利。成为代理可获得分佣、专属内容包与私域运营支持。</p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href="#" class="rounded-xl px-4 py-2 text-sm bg-white text-bg1 font-semibold">加入玩家社群</a>
+          <a href="#" class="rounded-xl px-4 py-2 text-sm glass">申请成为代理</a>
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4">
+        <div class="rounded-2xl chip p-4 text-center border border-white/10">
+          <div class="text-xs opacity-60">玩家福利</div>
+          <div class="text-lg font-bold mt-1">每日羊毛</div>
+        </div>
+        <div class="rounded-2xl chip p-4 text-center border border-white/10">
+          <div class="text-xs opacity-60">AI 预测</div>
+          <div class="text-lg font-bold mt-1">胜率 & 趋势</div>
+        </div>
+        <div class="rounded-2xl chip p-4 text-center border border-white/10">
+          <div class="text-xs opacity-60">代理支持</div>
+          <div class="text-lg font-bold mt-1">内容+分佣</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-8 text-sm text-white/60">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 grid place-items-center font-black">AI</div>
+          <span>SmartBet Hub</span>
+          <span class="text-xs chip px-2 py-0.5 rounded">Beta</span>
+        </div>
+        <div class="flex gap-5">
+          <a class="hover:text-white" href="#ai">AI 预测</a>
+          <a class="hover:text-white" href="#odds">赔率对比</a>
+          <a class="hover:text-white" href="#promos">羊毛中心</a>
+          <a class="hover:text-white" href="#scores">比分</a>
+          <a class="hover:text-white" href="#social">社群</a>
+        </div>
+      </div>
+      <div class="text-[11px] mt-4 opacity-60">本页面为产品原型，所有数据为示例。请遵循当地法律与责任博彩规范（18+）。</div>
+    </div>
+  </footer>
+
+  <script>
+    // Render lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

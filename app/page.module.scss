@@ -1,0 +1,733 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0b1220 0%, #0e1626 50%, #0b1220 100%);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: min(1200px, 100% - 2rem);
+  margin: 0 auto;
+}
+
+.chip {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(18px);
+  background: rgba(11, 18, 32, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerInner {
+  @extend .container;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0;
+  gap: 1.5rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.logoBadge {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+
+.logoTag {
+  @extend .chip;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav {
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.navLink {
+  transition: color 0.2s ease;
+  color: inherit;
+}
+
+.navLink:hover {
+  color: #ffffff;
+}
+
+.ctaGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hideOnMobile {
+  display: none;
+}
+
+.secondaryCta {
+  @extend .glass;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.primaryCta {
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.hero {
+  position: relative;
+  padding: 4rem 0 5rem;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(99, 102, 241, 0.25), transparent 60%);
+  pointer-events: none;
+}
+
+.heroInner {
+  position: relative;
+  @extend .container;
+  display: grid;
+  gap: 2.5rem;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 4vw + 1rem, 3.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.gradText {
+  background: linear-gradient(90deg, #818cf8, #67e8f9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.heroDescription {
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 32rem;
+  font-size: 1rem;
+}
+
+.heroDescription strong {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.heroButton {
+  display: inline-flex;
+  align-items: center;
+}
+
+.primaryAction {
+  background: #ffffff;
+  color: #0b1220;
+}
+
+.secondaryAction {
+  @extend .glass;
+  color: #f8fafc;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.metricIcon {
+  @extend .chip;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+}
+
+.metricLabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+}
+
+.metricValue {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+  color: #f8fafc;
+}
+
+.heroFootnote {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.aiCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  padding: 1.75rem;
+}
+
+.aiCard h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.aiCard > p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 1rem;
+}
+
+.aiCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.aiCardHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.aiCardTag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.15);
+  color: #6ee7b7;
+}
+
+.aiCardProbabilities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.aiCardProbabilities div {
+  @extend .chip;
+  padding: 0.9rem;
+  text-align: center;
+  border-radius: 1rem;
+}
+
+.aiCardProbabilities span {
+  display: block;
+}
+
+.aiCardProbabilities span:first-child {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.35rem;
+}
+
+.aiCardProbabilities span:last-child {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.aiRecommendation {
+  border-radius: 1rem;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 1rem;
+  background: rgba(99, 102, 241, 0.12);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.aiRecommendation strong {
+  display: block;
+  margin-top: 0.3rem;
+  color: #f8fafc;
+  font-size: 1.05rem;
+}
+
+.aiRecommendation p {
+  margin-top: 0.6rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.aiCardActions {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.aiButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.section {
+  padding: 3.5rem 0;
+}
+
+.sectionHeader {
+  @extend .container;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionHeaderTop {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: clamp(1.35rem, 0.8rem + 1vw, 1.6rem);
+  font-weight: 700;
+}
+
+.sectionTitle svg {
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.searchGroup {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.searchInput {
+  @extend .glass;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  color: inherit;
+  border: none;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.oddsGrid {
+  @extend .container;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.oddsCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.oddsCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.smallChip {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+}
+
+.oddsValues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.oddsValue {
+  @extend .chip;
+  padding: 0.9rem;
+  border-radius: 1rem;
+}
+
+.oddsLabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.3rem;
+}
+
+.oddsNumber {
+  font-weight: 700;
+}
+
+.cardButton {
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.promotionsGrid {
+  @extend .container;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.promoCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.promoMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.promoTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.promoCard p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.promoAction {
+  @extend .glass;
+  text-align: center;
+  border-radius: 0.75rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  display: block;
+}
+
+.scoresGrid {
+  @extend .container;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.scoreCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scoreMeta {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.scoreMatch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scoreTeams {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.scoreInfo {
+  text-align: right;
+}
+
+.scoreInfo strong {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.socialSection {
+  @extend .container;
+  margin-top: 2rem;
+}
+
+.socialCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  display: grid;
+  gap: 2rem;
+}
+
+.socialActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.socialPills {
+  display: grid;
+  gap: 1rem;
+}
+
+.socialPill {
+  @extend .chip;
+  border-radius: 1.25rem;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.footerInner {
+  @extend .container;
+  padding: 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footerTop {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.disclaimer {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.primaryBtn {
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.secondaryBtn {
+  @extend .glass;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+@media (min-width: 640px) {
+  .hideOnMobile {
+    display: inline-flex;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .aiCardActions {
+    flex-wrap: nowrap;
+  }
+
+  .promotionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scoresGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .socialPills {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
+  }
+
+  .secondaryCta {
+    display: inline-flex;
+  }
+
+  .searchGroup {
+    display: flex;
+  }
+
+  .heroInner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .promotionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scoresGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .socialCard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .oddsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .promotionsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .headerInner {
+    padding: 0.9rem 0;
+  }
+
+  .sectionHeaderTop {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .sectionHeaderTop {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .footerTop {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
