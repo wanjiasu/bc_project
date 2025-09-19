@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { useSession, signOut } from "next-auth/react"
 import Lottie from "lottie-react"
 import { BsFillCheckCircleFill } from "react-icons/bs"
@@ -10,6 +12,11 @@ import styles from "./index.module.scss"
 
 export const SignedIn = () => {
   const { data: session } = useSession()
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   return (
     <div className={styles.signedin_container}>
@@ -24,8 +31,8 @@ export const SignedIn = () => {
       <button onClick={() => signOut()} className={styles.btn_signout}>
         Sign out
       </button>
-      <div className={styles.lottie_container}>
-        <Lottie animationData={confetti} loop={false} />
+      <div className={styles.lottie_container} suppressHydrationWarning>
+        {isClient ? <Lottie animationData={confetti} loop={false} /> : null}
       </div>
     </div>
   )
