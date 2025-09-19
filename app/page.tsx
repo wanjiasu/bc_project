@@ -15,6 +15,7 @@ import {
   FiZap,
 } from "react-icons/fi"
 
+import { auth } from "auth"
 import styles from "./page.module.scss"
 
 const navItems = [
@@ -138,7 +139,20 @@ const socialPills = [
   { label: "代理支持", value: "内容+分佣" },
 ]
 
-export default function Page() {
+const getInitials = (name?: string | null, email?: string | null) => {
+  if (name && name.trim().length > 0) {
+    return name.trim().slice(0, 1).toUpperCase()
+  }
+  if (email && email.trim().length > 0) {
+    return email.trim().slice(0, 1).toUpperCase()
+  }
+  return "U"
+}
+
+export default async function Page() {
+  const session = await auth()
+  const user = session?.user
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -156,12 +170,38 @@ export default function Page() {
             ))}
           </nav>
           <div className={styles.ctaGroup}>
-            <Link href="/login" className={styles.secondaryCta}>
-              登录
-            </Link>
-            <a href="#ai" className={styles.primaryCta}>
-              免费使用
-            </a>
+            {user ? (
+              <div className={styles.userBadge}>
+                {user.image ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={user.image}
+                      alt={user.name ?? user.email ?? "avatar"}
+                      className={styles.userAvatar}
+                      referrerPolicy="no-referrer"
+                    />
+                  </>
+                ) : (
+                  <span className={styles.userInitials}>{getInitials(user.name, user.email)}</span>
+                )}
+                <div className={styles.userInfo}>
+                  <span className={styles.userName}>{user.name ?? user.email ?? "已登录"}</span>
+                  {user.email ? (
+                    <span className={styles.userEmail}>{user.email}</span>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <>
+                <Link href="/login" className={styles.secondaryCta}>
+                  登录
+                </Link>
+                <a href="#ai" className={styles.primaryCta}>
+                  免费使用
+                </a>
+              </>
+            )}
           </div>
         </div>
       </header>

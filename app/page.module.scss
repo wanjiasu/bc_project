@@ -88,6 +88,53 @@
   gap: 0.6rem;
 }
 
+.userBadge {
+  @extend .glass;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  color: #f8fafc;
+}
+
+.userAvatar,
+.userInitials {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  overflow: hidden;
+}
+
+.userAvatar {
+  object-fit: cover;
+  background: transparent;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.userName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.userEmail {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .hideOnMobile {
   display: none;
 }
