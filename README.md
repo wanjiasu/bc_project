@@ -29,3 +29,8 @@ cp .env.local.sample .env.local
 ```sh
 pnpm dev
 ```
+
+4. prodection
+```sh
+cp .env.production.sample .env.production
+```
