@@ -3,6 +3,8 @@ import Facebook from "next-auth/providers/facebook"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 
+import { recordSignInEvent } from "./src/lib/postgres"
+
 const authSecret =
   process.env.AUTH_SECRET ??
   process.env.NEXTAUTH_SECRET ??
@@ -28,4 +30,9 @@ export const { auth, handlers } = NextAuth({
     }),
   ],
   secret: authSecret,
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      await recordSignInEvent({ user, account, profile, isNewUser })
+    },
+  },
 })
