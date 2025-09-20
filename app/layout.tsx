@@ -1,13 +1,7 @@
 import type { Metadata } from "next"
 import { auth } from "auth"
 import { SessionProvider } from "next-auth/react"
-import { Inter } from "next/font/google"
 import "styles/globals.scss"
-
-const inter = Inter({
-  subsets: ["latin"],
-  fallback: ["Helvetica", "sans-serif"],
-})
 
 export const metadata: Metadata = {
   title: "next-social-login",
@@ -23,7 +17,7 @@ export default async function RootLayout({
   const session = await auth()
 
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en">
       <body suppressHydrationWarning>
         <SessionProvider session={session}>{children}</SessionProvider>
       </body>

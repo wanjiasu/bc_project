@@ -303,8 +303,8 @@ const parseJson = (value: JsonLike): Record<string, unknown> | null => {
 const pickFromObject = (source: Record<string, unknown> | null, keys: string[]): JsonLike => {
   if (!source) return null
   for (const key of keys) {
-    if (key in source) {
-      return source[key]
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      return source[key] as JsonLike
     }
   }
   return null
