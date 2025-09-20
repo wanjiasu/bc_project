@@ -576,8 +576,9 @@ const extractProbabilities = (source: Record<string, unknown> | null): { label: 
   if (Array.isArray(rawProbabilities)) {
     for (const entry of rawProbabilities) {
       if (entry && typeof entry === "object" && "label" in entry && "value" in entry) {
-        const label = getString((entry as Record<string, unknown>).label)
-        const value = getString((entry as Record<string, unknown>).value)
+        const entryRecord = entry as Record<string, unknown>
+        const label = getString(entryRecord.label as JsonLike)
+        const value = getString(entryRecord.value as JsonLike)
         if (label && value) {
           results.push({ label, value })
         }
@@ -594,8 +595,11 @@ const extractProbabilities = (source: Record<string, unknown> | null): { label: 
       } else if (typeof value === "string") {
         results.push({ label, value })
       } else if (typeof value === "object" && value !== null && "value" in value) {
-        const inner = (value as Record<string, unknown>).value
-        const formatted = typeof inner === "number" ? `${(inner <= 1 ? inner * 100 : inner).toFixed(1)}%` : getString(inner)
+        const innerValue = (value as Record<string, unknown>).value as JsonLike
+        const formatted =
+          typeof innerValue === "number"
+            ? `${(innerValue <= 1 ? innerValue * 100 : innerValue).toFixed(1)}%`
+            : getString(innerValue)
         if (formatted) {
           results.push({ label, value: formatted })
         }
