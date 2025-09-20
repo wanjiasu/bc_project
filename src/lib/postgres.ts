@@ -522,7 +522,7 @@ const extractInstitutionOdds = (
 
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
     for (const [name, odds] of Object.entries(raw)) {
-      processEntry(name, odds)
+      processEntry(name, odds as JsonLike)
     }
   }
 
