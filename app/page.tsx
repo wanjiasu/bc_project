@@ -140,6 +140,8 @@ export default async function Page() {
       confidence: 87,
       homeTeam: "Liverpool",
       awayTeam: "Man United",
+      fixtureId: "fixture-fallback-1",
+      fixtureDate: null,
       institutionOdds: [
         {
           name: "10Bet",
@@ -163,6 +165,7 @@ export default async function Page() {
   const carouselHighlights = highlights.map((item) => ({
     ...item,
     matchTime: item.matchTime ? item.matchTime.toISOString() : null,
+    fixtureId: item.fixtureId ?? (typeof item.id === "string" ? item.id : null),
     institutionOdds:
       item.institutionOdds?.map((entry) => ({
         name: entry.name,

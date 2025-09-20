@@ -15,6 +15,7 @@ export type Highlight = {
   title: string
   matchTime: string | null
   fixtureDate: string | null
+  fixtureId?: string | null
   comment: string | null
   market: string | null
   pick: string | null
@@ -85,6 +86,7 @@ type AiHighlightsCarouselProps = {
   total: number
   onPrev: () => void
   onNext: () => void
+  onOpenModal?: () => void
 }
 
 export const AiHighlightsCarousel = ({
@@ -94,6 +96,7 @@ export const AiHighlightsCarousel = ({
   total,
   onPrev,
   onNext,
+  onOpenModal,
 }: AiHighlightsCarouselProps) => {
   const odds = displayedOdds.length ? displayedOdds : fallbackDisplayedOdds
   const safeIndex = total > 0 ? ((index % total) + total) % total : 0
@@ -130,9 +133,13 @@ export const AiHighlightsCarousel = ({
         </div>
 
         <div className={styles.aiCardActions}>
-          <a href="#ai" className={`${styles.aiButton} ${styles.primaryAction}`}>
+          <button 
+            onClick={onOpenModal}
+            className={`${styles.aiButton} ${styles.primaryAction}`}
+            disabled={!onOpenModal}
+          >
             <FiStar size={16} /> 更多 AI Picks
-          </a>
+          </button>
           <a href="#ai" className={`${styles.aiButton} ${styles.secondaryAction}`}>
             <FiBarChart2 size={16} /> 历史命中
           </a>

@@ -689,6 +689,7 @@ export type AiHighlight = {
   title: string
   matchTime: Date | null
   fixtureDate: string | null
+  fixtureId: string | null
   comment: string | null
   market: string | null
   pick: string | null
@@ -731,6 +732,7 @@ const parseAiHighlight = (row: Record<string, unknown>): AiHighlight | null => {
   const matchTime = extractMatchTime(row, response)
 
   const fixtureDate = getString(pickFromObject(response, ["fixture_date", "fixtureDate"])) ?? null
+  const fixtureId = getString(row.fixture_id as JsonLike) ?? null
 
   const market =
     getString(row.recommendation_market as JsonLike) ??
@@ -779,6 +781,7 @@ const parseAiHighlight = (row: Record<string, unknown>): AiHighlight | null => {
     homeTeam,
     awayTeam,
     institutionOdds,
+    fixtureId,
   }
 }
 
@@ -811,5 +814,31 @@ export async function fetchTopAiRecommendations(limit = 3): Promise<AiHighlight[
   } catch (error) {
     console.error("Failed to fetch AI recommendations", error)
     return []
+  }
+}
+
+export async function fetchFixtureById(fixtureId: string): Promise<AiHighlight | null> {
+  const db = getPool()
+  if (!db) {
+    debugLog("Skipping fetchFixtureById: no database connection available")
+    return null
+  }
+
+  try {
+    const query = `
+      SELECT *
+      FROM ai_eval
+      WHERE fixture_id = $1
+      ORDER BY recommendation_index DESC NULLS LAST
+      LIMIT 1
+    `
+
+    const { rows } = await db.query(query, [fixtureId])
+    if (!rows.length) return null
+
+    return parseAiHighlight(rows[0])
+  } catch (error) {
+    console.error("Failed to fetch fixture", { fixtureId, error })
+    return null
   }
 }

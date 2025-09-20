@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import {
   FiBarChart2,
@@ -17,6 +17,7 @@ import type { IconType } from "react-icons"
 
 import styles from "../page.module.scss"
 import { AiHighlightsCarousel, Highlight } from "./AiHighlightsCarousel"
+import AiPicksModal, { AiPick } from "./AiPicksModal"
 
 type MetricIcon = "trend" | "users" | "coverage" | "shield"
 
@@ -58,40 +59,103 @@ export const AiHighlightsSection = ({
   metrics,
   fallbackOdds,
 }: AiHighlightsSectionProps) => {
-  const data = useMemo(() => (highlights.length ? highlights : []), [highlights])
+  const [data, setData] = useState<Highlight[]>(() => (highlights.length ? highlights : []))
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  useEffect(() => {
+    const initial = highlights.length ? highlights : []
+    setData(initial)
+    setActiveIndex(0)
+  }, [highlights])
 
   const total = data.length || 1
   const index = data.length ? ((activeIndex % total) + total) % total : 0
   const activeHighlight = data.length ? data[index] : null
 
-  const fallbackTopOdds = fallbackOdds.length
-    ? [
-        { label: "主胜", value: fallbackOdds[0].home ?? fallbackDisplayedOdds[0].value },
-        { label: "平局", value: fallbackOdds[0].draw ?? fallbackDisplayedOdds[1].value },
-        { label: "客胜", value: fallbackOdds[0].away ?? fallbackDisplayedOdds[2].value },
+  const fallbackTopOdds = useMemo(() => {
+    if (fallbackOdds.length) {
+      const [first] = fallbackOdds
+      return [
+        { label: "主胜", value: first.home ?? fallbackDisplayedOdds[0].value },
+        { label: "平局", value: first.draw ?? fallbackDisplayedOdds[1].value },
+        { label: "客胜", value: first.away ?? fallbackDisplayedOdds[2].value },
       ]
-    : fallbackDisplayedOdds
+    }
+    return fallbackDisplayedOdds
+  }, [fallbackOdds])
 
-  const displayedOdds = activeHighlight?.probabilities?.length
-    ? activeHighlight.probabilities
-    : fallbackTopOdds
+  const displayedOdds = useMemo(() => {
+    const topVendor = activeHighlight?.institutionOdds?.[0]
+    if (topVendor) {
+      return [
+        { label: "主胜", value: topVendor.home ?? fallbackTopOdds[0].value },
+        { label: "平局", value: topVendor.draw ?? fallbackTopOdds[1].value },
+        { label: "客胜", value: topVendor.away ?? fallbackTopOdds[2].value },
+      ]
+    }
+    if (activeHighlight?.probabilities?.length) {
+      return activeHighlight.probabilities
+    }
+    return fallbackTopOdds
+  }, [activeHighlight, fallbackTopOdds])
 
-  const oddsVendors = activeHighlight?.institutionOdds?.length
-    ? activeHighlight.institutionOdds.map((vendor) => ({
-        name: vendor.name,
-        offer: vendor.offer ?? "即时赔率",
-        home: vendor.home ?? "-",
-        draw: vendor.draw ?? "-",
-        away: vendor.away ?? "-",
-      }))
-    : fallbackOdds.map((vendor) => ({
-        name: vendor.name,
-        offer: vendor.offer ?? "即时赔率",
-        home: vendor.home ?? "-",
-        draw: vendor.draw ?? "-",
-        away: vendor.away ?? "-",
-      }))
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleSelectPick = async (pick: AiPick) => {
+    if (!pick.fixtureId) return
+    try {
+      const response = await fetch(`/api/fixture/${pick.fixtureId}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch fixture data")
+      }
+
+      const { fixture } = await response.json()
+
+      const newHighlight: Highlight = {
+        id: fixture.id,
+        title: `${fixture.homeTeam || "主队"} vs ${fixture.awayTeam || "客队"}`,
+        matchTime: fixture.matchTime,
+        fixtureDate: fixture.fixtureDate ?? fixture.matchTime ?? null,
+        comment: fixture.comment,
+        market: fixture.market,
+        pick: fixture.pick,
+        averageOdds: fixture.averageOdds,
+        probabilities: fixture.probabilities ?? [],
+        confidence: fixture.confidence,
+        institutionOdds: fixture.institutionOdds ?? [],
+        fixtureId: fixture.fixtureId ?? pick.fixtureId,
+      }
+
+      setData((prevData) => [
+        newHighlight,
+        ...prevData.filter((item) => item.fixtureId !== newHighlight.fixtureId),
+      ])
+      setActiveIndex(0)
+    } catch (error) {
+      console.error("Error loading selected fixture:", error)
+    }
+  }
+
+  const oddsVendors = useMemo(() => {
+    const vendors = activeHighlight?.institutionOdds?.length
+      ? activeHighlight.institutionOdds
+      : fallbackOdds
+
+    return vendors.map((vendor) => ({
+      name: vendor.name,
+      offer: vendor.offer ?? "即时赔率",
+      home: vendor.home ?? "-",
+      draw: vendor.draw ?? "-",
+      away: vendor.away ?? "-",
+    }))
+  }, [activeHighlight?.institutionOdds, fallbackOdds])
 
   return (
     <>
@@ -106,9 +170,12 @@ export const AiHighlightsSection = ({
               聚合。东南亚 &amp; 南美玩家的智能下注第一入口。
             </p>
             <div className={styles.heroActions}>
-              <a href="#ai" className={`${styles.primaryAction} ${styles.heroButton}`}>
+              <button 
+                onClick={handleOpenModal}
+                className={`${styles.primaryAction} ${styles.heroButton}`}
+              >
                 <FiZap size={16} /> 立即查看今日 AI Picks
-              </a>
+              </button>
               <a href="#promos" className={`${styles.secondaryAction} ${styles.heroButton}`}>
                 <FiPercent size={16} /> 进入羊毛中心
               </a>
@@ -132,13 +199,18 @@ export const AiHighlightsSection = ({
             <p className={styles.heroFootnote}>*示例数据，仅作展示</p>
           </div>
 
-          <AiHighlightsCarousel
-            highlight={activeHighlight ?? null}
+         <AiHighlightsCarousel
+           highlight={activeHighlight ?? null}
             displayedOdds={displayedOdds}
             index={index}
             total={total}
-            onPrev={() => setActiveIndex((prev) => (prev === 0 ? total - 1 : prev - 1))}
-            onNext={() => setActiveIndex((prev) => (prev + 1) % total)}
+            onPrev={() =>
+              setActiveIndex((prev) => (prev === 0 ? total - 1 : prev - 1))
+            }
+            onNext={() =>
+              setActiveIndex((prev) => (prev + 1) % total)
+            }
+            onOpenModal={handleOpenModal}
           />
         </div>
       </section>
@@ -191,6 +263,12 @@ export const AiHighlightsSection = ({
           ))}
         </div>
       </section>
+
+      <AiPicksModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSelectPick={handleSelectPick}
+      />
     </>
   )
 }
