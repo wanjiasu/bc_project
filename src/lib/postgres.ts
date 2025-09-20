@@ -631,7 +631,7 @@ const extractMatchTime = (
 ): Date | null => {
   for (const key of matchTimeKeys) {
     if (key in row) {
-      const date = parseDateValue(row[key])
+      const date = parseDateValue(row[key] as JsonLike)
       if (date) return date
     }
   }
