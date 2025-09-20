@@ -14,6 +14,7 @@ export type Highlight = {
   id: string
   title: string
   matchTime: string | null
+  fixtureDate: string | null
   comment: string | null
   market: string | null
   pick: string | null
@@ -35,7 +36,32 @@ const fallbackDisplayedOdds = [
   { label: "客胜", value: "2.44" },
 ]
 
-const formatMatchTime = (iso: string | null) => {
+const formatMatchTime = (iso: string | null, fixtureDate: string | null) => {
+  // 优先使用fixtureDate，如果它包含"时间待定"则直接返回
+  if (fixtureDate && fixtureDate.includes("时间待定")) {
+    return fixtureDate
+  }
+  
+  // 如果fixtureDate存在且不包含"时间待定"，尝试解析它
+  if (fixtureDate) {
+    const date = new Date(fixtureDate)
+    if (!Number.isNaN(date.getTime())) {
+      try {
+        return new Intl.DateTimeFormat("zh-CN", {
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }).format(date)
+      } catch {
+        // 如果格式化失败，继续使用原始fixtureDate
+        return fixtureDate
+      }
+    }
+  }
+  
+  // 回退到使用matchTime
   if (!iso) return "时间待定"
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return "时间待定"
@@ -86,7 +112,7 @@ export const AiHighlightsCarousel = ({
           </span>
         </div>
         <h3>{highlight?.title ?? "AI 推荐赛事"}</h3>
-        <p>{`开赛时间：${formatMatchTime(highlight?.matchTime ?? null)}`}</p>
+        <p>{`开赛时间：${formatMatchTime(highlight?.matchTime ?? null, highlight?.fixtureDate ?? null)}`}</p>
 
         <div className={styles.aiCardProbabilities}>
           {odds.map(({ label, value }) => (

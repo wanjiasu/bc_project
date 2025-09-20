@@ -131,6 +131,7 @@ export default async function Page() {
       id: "fallback-1",
       title: "Liverpool vs. Man United",
       matchTime: null,
+      fixtureDate: "时间待定",
       comment: "AI 参考近期 xG（2.1 vs 1.2）与高压迫抢回率。市场高估德比波动；主胜具备价值。",
       market: "推荐盘口 · FT 1X2",
       pick: "Home",

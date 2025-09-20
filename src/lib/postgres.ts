@@ -208,6 +208,8 @@ const jsonMatchTimeKeys = [
   "kickoffAt",
   "fixture_time",
   "fixtureTime",
+  "fixture_date",
+  "fixtureDate",
   "start_time",
   "startTime",
   "event_time",
@@ -686,6 +688,7 @@ export type AiHighlight = {
   id: string
   title: string
   matchTime: Date | null
+  fixtureDate: string | null
   comment: string | null
   market: string | null
   pick: string | null
@@ -727,6 +730,8 @@ const parseAiHighlight = (row: Record<string, unknown>): AiHighlight | null => {
 
   const matchTime = extractMatchTime(row, response)
 
+  const fixtureDate = getString(pickFromObject(response, ["fixture_date", "fixtureDate"])) ?? null
+
   const market =
     getString(row.recommendation_market as JsonLike) ??
     getString(pickFromObject(response, marketKeys)) ??
@@ -764,6 +769,7 @@ const parseAiHighlight = (row: Record<string, unknown>): AiHighlight | null => {
     id: String(row.id ?? `${homeTeam ?? "home"}-${awayTeam ?? "away"}-${matchTime?.getTime() ?? Date.now()}`),
     title,
     matchTime,
+    fixtureDate,
     comment,
     market,
     pick,
