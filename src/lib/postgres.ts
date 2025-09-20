@@ -476,6 +476,7 @@ const extractInstitutionOdds = (
   home: string | null
   draw: string | null
   away: string | null
+  offer: string | null
 }[] => {
   if (!source) return []
   const raw = pickFromObject(source, institutionOddsKeys)
@@ -484,6 +485,7 @@ const extractInstitutionOdds = (
     home: string | null
     draw: string | null
     away: string | null
+    offer: string | null
   }[] = []
 
   const processEntry = (label: string, value: JsonLike) => {
@@ -505,6 +507,7 @@ const extractInstitutionOdds = (
         home,
         draw,
         away,
+        offer: getString(base.offer as JsonLike) ?? null,
       })
     }
   }
@@ -692,6 +695,7 @@ export type AiHighlight = {
     home: string | null
     draw: string | null
     away: string | null
+    offer: string | null
   }[]
 }
 
