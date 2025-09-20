@@ -141,7 +141,7 @@ export default async function Page() {
       homeTeam: "Liverpool",
       awayTeam: "Man United",
       fixtureId: "fixture-fallback-1",
-      fixtureDate: null,
+// 删除重复的 fixtureDate 属性，因为在上面已经定义过了
       institutionOdds: [
         {
           name: "10Bet",
