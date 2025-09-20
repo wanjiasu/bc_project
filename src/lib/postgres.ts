@@ -278,7 +278,7 @@ const getString = (value: JsonLike): string | null => {
   if (typeof value === "string") return value
   if (typeof value === "number") return Number.isFinite(value) ? value.toString() : null
   if (Array.isArray(value) && value.length > 0) {
-    return getString(value[0])
+    return getString(value[0] as JsonLike)
   }
   if (typeof value === "object" && "name" in value && typeof value.name === "string") {
     return value.name
@@ -756,7 +756,7 @@ const parseAiHighlight = (row: Record<string, unknown>): AiHighlight | null => {
 
   const confidence = normalizeConfidence(row.recommendation_index as JsonLike)
 
-  const comment = sanitizeComment(row.recommendation_comment as JsonLike, getString(response?.comment))
+  const comment = sanitizeComment(row.recommendation_comment as JsonLike, getString(response?.comment as JsonLike))
 
   const title = homeTeam && awayTeam ? `${homeTeam} vs. ${awayTeam}` : "AI 推荐赛事"
 
