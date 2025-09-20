@@ -1,23 +1,18 @@
 import {
   FiActivity,
-  FiArrowRight,
   FiAward,
-  FiBarChart2,
   FiGift,
-  FiGlobe,
   FiLink,
-  FiPercent,
   FiShield,
   FiTrendingUp,
   FiUsers,
-  FiZap,
 } from "react-icons/fi"
 
 import { auth } from "auth"
 import { fetchTopAiRecommendations } from "src/lib/postgres"
 import type { AiHighlight } from "src/lib/postgres"
 import { UserMenuServerWrapper } from "src/components/Header/UserMenuServerWrapper"
-import { AiHighlightsCarousel } from "./components/AiHighlightsCarousel"
+import { AiHighlightsSection } from "./components/AiHighlightsSection"
 import styles from "./page.module.scss"
 
 const navItems = [
@@ -38,28 +33,28 @@ const heroMetrics = [
 const fallbackOddsVendors = [
   {
     name: "GG.bet",
-    offer: "100% up to $100",
+    offer: "即时赔率",
     home: "1.78",
     draw: "3.90",
     away: "4.40",
   },
   {
     name: "1xBet",
-    offer: "$30 free bet",
+    offer: "即时赔率",
     home: "1.80",
     draw: "3.85",
     away: "4.35",
   },
   {
     name: "Parimatch",
-    offer: "10% cashback",
+    offer: "即时赔率",
     home: "1.76",
     draw: "3.95",
     away: "4.50",
   },
   {
     name: "Thunderpick",
-    offer: "Crypto bonus +10%",
+    offer: "即时赔率",
     home: "1.79",
     draw: "3.88",
     away: "4.42",
@@ -177,18 +172,6 @@ export default async function Page() {
       })) ?? [],
   }))
 
-  const primaryHighlight = carouselHighlights[0]
-  const oddsVendors = (primaryHighlight?.institutionOdds?.length
-    ? primaryHighlight.institutionOdds
-    : fallbackOddsVendors
-  ).map((vendor) => ({
-    name: vendor.name,
-    offer: vendor.offer ?? "即时赔率",
-    home: vendor.home ?? "-",
-    draw: vendor.draw ?? "-",
-    away: vendor.away ?? "-",
-  }))
-
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -210,89 +193,11 @@ export default async function Page() {
       </header>
 
       <main>
-        <section className={styles.hero}>
-          <div className={styles.heroInner}>
-            <div className={styles.heroContent}>
-              <h1 className={styles.heroTitle}>
-                下注之前，先看 <span className={styles.gradText}>AI 怎么说</span>
-              </h1>
-              <p className={styles.heroDescription}>
-                一站式 <strong>AI 预测</strong>、<strong>赔率对比</strong> 与 <strong>羊毛福利</strong>
-                聚合。东南亚 &amp; 南美玩家的智能下注第一入口。
-              </p>
-              <div className={styles.heroActions}>
-                <a href="#ai" className={`${styles.primaryAction} ${styles.heroButton}`}>
-                  <FiZap size={16} /> 立即查看今日 AI Picks
-                </a>
-                <a href="#promos" className={`${styles.secondaryAction} ${styles.heroButton}`}>
-                  <FiPercent size={16} /> 进入羊毛中心
-                </a>
-              </div>
-              <div className={styles.metrics}>
-                {heroMetrics.map(({ label, value, icon: Icon }) => (
-                  <div key={label} className={styles.metric}>
-                    <span className={styles.metricIcon}>
-                      <Icon size={20} />
-                    </span>
-                    <span>
-                      <span className={styles.metricLabel}>{label}</span>
-                      <span className={styles.metricValue}>{value}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className={styles.heroFootnote}></p>
-            </div>
-            <AiHighlightsCarousel highlights={carouselHighlights} />
-          </div>
-        </section>
-
-        <section id="odds" className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div className={styles.sectionHeaderTop}>
-              <h2 className={styles.sectionTitle}>
-                <FiBarChart2 size={20} /> 赔率对比（示例）
-              </h2>
-              <div className={styles.searchGroup}>
-                <input
-                  className={styles.searchInput}
-                  placeholder="搜索赛事 / 联赛"
-                  type="text"
-                />
-                <button className={styles.primaryBtn} type="button">
-                  搜索
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className={styles.oddsGrid}>
-            {oddsVendors.map((book) => (
-              <div key={book.name} className={styles.oddsCard}>
-                <div className={styles.oddsCardHeader}>
-                  <span className={styles.cardTitle}>
-                    <FiGlobe size={18} /> {book.name}
-                  </span>
-                  <span className={`${styles.chip} ${styles.smallChip}`}>{book.offer}</span>
-                </div>
-                <div className={styles.oddsValues}>
-                  {[
-                    { label: "主胜", value: book.home },
-                    { label: "平局", value: book.draw },
-                    { label: "客胜", value: book.away },
-                  ].map((value) => (
-                    <div key={`${book.name}-${value.label}`} className={styles.oddsValue}>
-                      <div className={styles.oddsLabel}>{value.label}</div>
-                      <div className={styles.oddsNumber}>{value.value}</div>
-                    </div>
-                  ))}
-                </div>
-                <a href="#" className={styles.cardButton}>
-                  通过我们去下注 <FiArrowRight size={16} />
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
+        <AiHighlightsSection
+          highlights={carouselHighlights}
+          metrics={heroMetrics}
+          fallbackOdds={fallbackOddsVendors}
+        />
 
         <section id="promos" className={styles.section}>
           <div className={styles.sectionHeader}>

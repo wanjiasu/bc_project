@@ -1,7 +1,5 @@
 "use client"
 
-import { useMemo, useState } from "react"
-
 import {
   FiActivity,
   FiBarChart2,
@@ -12,7 +10,7 @@ import {
 
 import styles from "../page.module.scss"
 
-type Highlight = {
+export type Highlight = {
   id: string
   title: string
   matchTime: string | null
@@ -27,11 +25,11 @@ type Highlight = {
     home: string | null
     draw: string | null
     away: string | null
-    offer?: string | null
+    offer: string | null
   }[]
 }
 
-const fallbackProbabilities = [
+const fallbackDisplayedOdds = [
   { label: "主胜", value: "2.32" },
   { label: "平局", value: "3.69" },
   { label: "客胜", value: "2.44" },
@@ -54,46 +52,26 @@ const formatMatchTime = (iso: string | null) => {
   }
 }
 
-const parseAverageOdds = (averageOdds: string | null) => {
-  if (!averageOdds) return fallbackProbabilities
-
-  const parts = averageOdds.split(/[\/、，,]+/)
-  const entries: { label: string; value: string }[] = []
-
-  for (const part of parts) {
-    const match = part.match(/([^:：]+)[:：]\s*([0-9]*\.?[0-9]+)/)
-    if (match) {
-      const rawLabel = match[1].trim()
-      const odds = match[2].trim()
-      let label = rawLabel
-      if (/home|主/i.test(rawLabel)) label = "主胜"
-      else if (/away|客/i.test(rawLabel)) label = "客胜"
-      else if (/draw|平/i.test(rawLabel)) label = "平局"
-      entries.push({ label, value: odds })
-    }
-  }
-
-  return entries.length ? entries : fallbackProbabilities
+type AiHighlightsCarouselProps = {
+  highlight: Highlight | null
+  displayedOdds?: { label: string; value: string }[]
+  index: number
+  total: number
+  onPrev: () => void
+  onNext: () => void
 }
 
-export const AiHighlightsCarousel = ({ highlights }: { highlights: Highlight[] }) => {
-  const data = useMemo(() => (highlights.length ? highlights : []), [highlights])
-  const [index, setIndex] = useState(0)
-
-  if (!data.length) return null
-
-  const current = data[Math.min(index, data.length - 1)]
-  const probabilityFallback = current.averageOdds ? parseAverageOdds(current.averageOdds) : fallbackProbabilities
-  const probabilities = (current.probabilities?.length ? current.probabilities : probabilityFallback).slice(0, 3)
-  const institutionOdds = current.institutionOdds?.length ? current.institutionOdds : []
-
-  const goPrev = () => {
-    setIndex((prev) => (prev === 0 ? data.length - 1 : prev - 1))
-  }
-
-  const goNext = () => {
-    setIndex((prev) => (prev + 1) % data.length)
-  }
+export const AiHighlightsCarousel = ({
+  highlight,
+  displayedOdds = fallbackDisplayedOdds,
+  index,
+  total,
+  onPrev,
+  onNext,
+}: AiHighlightsCarouselProps) => {
+  const odds = displayedOdds.length ? displayedOdds : fallbackDisplayedOdds
+  const safeIndex = total > 0 ? ((index % total) + total) % total : 0
+  const showNavigation = total > 1
 
   return (
     <div className={styles.aiCarousel}>
@@ -104,14 +82,14 @@ export const AiHighlightsCarousel = ({ highlights }: { highlights: Highlight[] }
             <span>今日 AI 重点</span>
           </div>
           <span className={styles.aiCardTag}>
-            {current.confidence != null ? `信心 ${current.confidence}%` : "AI 推荐"}
+            {highlight?.confidence != null ? `信心 ${highlight.confidence}%` : "AI 推荐"}
           </span>
         </div>
-        <h3>{current.title ?? "AI 推荐赛事"}</h3>
-        <p>{`开赛时间：${formatMatchTime(current.matchTime)}`}</p>
+        <h3>{highlight?.title ?? "AI 推荐赛事"}</h3>
+        <p>{`开赛时间：${formatMatchTime(highlight?.matchTime ?? null)}`}</p>
 
         <div className={styles.aiCardProbabilities}>
-          {probabilities.map(({ label, value }) => (
+          {odds.map(({ label, value }) => (
             <div key={label}>
               <span>{label}</span>
               <span>{value}</span>
@@ -120,9 +98,9 @@ export const AiHighlightsCarousel = ({ highlights }: { highlights: Highlight[] }
         </div>
 
         <div className={styles.aiRecommendation}>
-          <span>{current.market ?? "推荐盘口"}</span>
-          {current.pick ? <strong>{current.pick}</strong> : null}
-          {current.comment ? <p>{current.comment}</p> : <p>数据加载中…</p>}
+          <span>{highlight?.market ?? "推荐盘口"}</span>
+          {highlight?.pick ? <strong>{highlight.pick}</strong> : null}
+          {highlight?.comment ? <p>{highlight.comment}</p> : <p>数据加载中…</p>}
         </div>
 
         <div className={styles.aiCardActions}>
@@ -135,13 +113,13 @@ export const AiHighlightsCarousel = ({ highlights }: { highlights: Highlight[] }
         </div>
       </div>
 
-      {data.length > 1 ? (
+      {showNavigation ? (
         <div className={styles.aiCarouselNav}>
           <div className={styles.aiNavButtons}>
             <button
               type="button"
               className={styles.aiNavButton}
-              onClick={goPrev}
+              onClick={onPrev}
               aria-label="上一场"
             >
               <FiChevronLeft size={18} />
@@ -149,14 +127,14 @@ export const AiHighlightsCarousel = ({ highlights }: { highlights: Highlight[] }
             <button
               type="button"
               className={styles.aiNavButton}
-              onClick={goNext}
+              onClick={onNext}
               aria-label="下一场"
             >
               <FiChevronRight size={18} />
             </button>
           </div>
           <span className={styles.aiCarouselIndex}>
-            {String(index + 1).padStart(2, "0")} / {String(data.length).padStart(2, "0")}
+            {String(safeIndex + 1).padStart(2, "0")} / {String(total || 1).padStart(2, "0")}
           </span>
         </div>
       ) : null}
