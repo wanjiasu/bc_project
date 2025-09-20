@@ -8,16 +8,22 @@ import {
   FiPercent,
   FiZap,
   FiArrowRight,
+  FiTrendingUp,
+  FiUsers,
+  FiAward,
+  FiShield,
 } from "react-icons/fi"
 import type { IconType } from "react-icons"
 
 import styles from "../page.module.scss"
 import { AiHighlightsCarousel, Highlight } from "./AiHighlightsCarousel"
 
+type MetricIcon = "trend" | "users" | "coverage" | "shield"
+
 type Metric = {
   label: string
   value: string
-  icon: IconType
+  icon: MetricIcon
 }
 
 type OddsVendor = {
@@ -32,6 +38,13 @@ type AiHighlightsSectionProps = {
   highlights: Highlight[]
   metrics: Metric[]
   fallbackOdds: OddsVendor[]
+}
+
+const metricIconMap: Record<MetricIcon, IconType> = {
+  trend: FiTrendingUp,
+  users: FiUsers,
+  coverage: FiAward,
+  shield: FiShield,
 }
 
 const fallbackDisplayedOdds = [
@@ -101,17 +114,20 @@ export const AiHighlightsSection = ({
               </a>
             </div>
             <div className={styles.metrics}>
-              {metrics.map(({ label, value, icon: Icon }) => (
-                <div key={label} className={styles.metric}>
-                  <span className={styles.metricIcon}>
-                    <Icon size={20} />
-                  </span>
-                  <span>
-                    <span className={styles.metricLabel}>{label}</span>
-                    <span className={styles.metricValue}>{value}</span>
-                  </span>
-                </div>
-              ))}
+              {metrics.map(({ label, value, icon }) => {
+                const Icon = metricIconMap[icon] ?? FiAward
+                return (
+                  <div key={label} className={styles.metric}>
+                    <span className={styles.metricIcon}>
+                      <Icon size={20} />
+                    </span>
+                    <span>
+                      <span className={styles.metricLabel}>{label}</span>
+                      <span className={styles.metricValue}>{value}</span>
+                    </span>
+                  </div>
+                )
+              })}
             </div>
             <p className={styles.heroFootnote}>*示例数据，仅作展示</p>
           </div>

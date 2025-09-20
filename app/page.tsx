@@ -24,10 +24,10 @@ const navItems = [
 ]
 
 const heroMetrics = [
-  { label: "近7日命中率*", value: "63%", icon: FiTrendingUp },
-  { label: "私域用户", value: "3,214", icon: FiUsers },
-  { label: "覆盖渠道", value: "8+", icon: FiAward },
-  { label: "风控模型", value: "Beta", icon: FiShield },
+  { label: "近7日命中率*", value: "63%", icon: "trend" as const },
+  { label: "私域用户", value: "3,214", icon: "users" as const },
+  { label: "覆盖渠道", value: "8+", icon: "coverage" as const },
+  { label: "风控模型", value: "Beta", icon: "shield" as const },
 ]
 
 const fallbackOddsVendors = [
