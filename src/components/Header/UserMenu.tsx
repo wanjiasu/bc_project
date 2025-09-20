@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 
+import type { User } from "next-auth"
 import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 
@@ -10,11 +11,7 @@ import styles from "./UserMenu.module.scss"
 import { getInitials } from "./utils"
 
 type UserMenuProps = {
-  initialUser: ReturnType<typeof useSession>["data"] extends infer T
-    ? T extends { user?: infer U }
-      ? U | null
-      : null
-    : null
+  initialUser: User | null
 }
 
 export const UserMenu = ({ initialUser }: UserMenuProps) => {

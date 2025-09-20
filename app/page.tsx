@@ -8,14 +8,16 @@ import {
   FiLink,
   FiPercent,
   FiShield,
-  FiStar,
   FiTrendingUp,
   FiUsers,
   FiZap,
 } from "react-icons/fi"
 
 import { auth } from "auth"
+import { fetchTopAiRecommendations } from "src/lib/postgres"
+import type { AiHighlight } from "src/lib/postgres"
 import { UserMenuServerWrapper } from "src/components/Header/UserMenuServerWrapper"
+import { AiHighlightsCarousel } from "./components/AiHighlightsCarousel"
 import styles from "./page.module.scss"
 
 const navItems = [
@@ -33,48 +35,34 @@ const heroMetrics = [
   { label: "风控模型", value: "Beta", icon: FiShield },
 ]
 
-const heroProbabilities = [
-  { label: "主胜", value: "62%" },
-  { label: "平局", value: "21%" },
-  { label: "客胜", value: "17%" },
-]
-
-const oddsData = [
+const fallbackOddsVendors = [
   {
-    brand: "GG.bet",
+    name: "GG.bet",
     offer: "100% up to $100",
-    values: [
-      { label: "主胜", value: "1.78" },
-      { label: "平局", value: "3.90" },
-      { label: "客胜", value: "4.40" },
-    ],
+    home: "1.78",
+    draw: "3.90",
+    away: "4.40",
   },
   {
-    brand: "1xBet",
+    name: "1xBet",
     offer: "$30 free bet",
-    values: [
-      { label: "主胜", value: "1.80" },
-      { label: "平局", value: "3.85" },
-      { label: "客胜", value: "4.35" },
-    ],
+    home: "1.80",
+    draw: "3.85",
+    away: "4.35",
   },
   {
-    brand: "Parimatch",
+    name: "Parimatch",
     offer: "10% cashback",
-    values: [
-      { label: "主胜", value: "1.76" },
-      { label: "平局", value: "3.95" },
-      { label: "客胜", value: "4.50" },
-    ],
+    home: "1.76",
+    draw: "3.95",
+    away: "4.50",
   },
   {
-    brand: "Thunderpick",
+    name: "Thunderpick",
     offer: "Crypto bonus +10%",
-    values: [
-      { label: "主胜", value: "1.79" },
-      { label: "平局", value: "3.88" },
-      { label: "客胜", value: "4.42" },
-    ],
+    home: "1.79",
+    draw: "3.88",
+    away: "4.42",
   },
 ]
 
@@ -141,6 +129,63 @@ const socialPills = [
 
 export default async function Page() {
   const session = await auth()
+  const aiRecommendations = await fetchTopAiRecommendations(3)
+
+  const fallbackRecommendations: AiHighlight[] = [
+    {
+      id: "fallback-1",
+      title: "Liverpool vs. Man United",
+      matchTime: null,
+      comment: "AI 参考近期 xG（2.1 vs 1.2）与高压迫抢回率。市场高估德比波动；主胜具备价值。",
+      market: "推荐盘口 · FT 1X2",
+      pick: "Home",
+      averageOdds: "Home: 2.32 / Draw: 3.69 / Away: 2.44",
+      probabilities: [],
+      confidence: 87,
+      homeTeam: "Liverpool",
+      awayTeam: "Man United",
+      institutionOdds: [
+        {
+          name: "10Bet",
+          home: "3.20",
+          draw: "3.40",
+          away: "1.95",
+        },
+        {
+          name: "William Hill",
+          home: "3.10",
+          draw: "3.50",
+          away: "2.00",
+        },
+      ],
+    },
+  ]
+
+  const highlights = aiRecommendations.length ? aiRecommendations : fallbackRecommendations
+  const carouselHighlights = highlights.map((item) => ({
+    ...item,
+    matchTime: item.matchTime ? item.matchTime.toISOString() : null,
+    institutionOdds:
+      item.institutionOdds?.map((entry) => ({
+        name: entry.name,
+        home: entry.home ?? null,
+        draw: entry.draw ?? null,
+        away: entry.away ?? null,
+        offer: entry.offer ?? null,
+      })) ?? [],
+  }))
+
+  const primaryHighlight = carouselHighlights[0]
+  const oddsVendors = (primaryHighlight?.institutionOdds?.length
+    ? primaryHighlight.institutionOdds
+    : fallbackOddsVendors
+  ).map((vendor) => ({
+    name: vendor.name,
+    offer: vendor.offer ?? "即时赔率",
+    home: vendor.home ?? "-",
+    draw: vendor.draw ?? "-",
+    away: vendor.away ?? "-",
+  }))
 
   return (
     <div className={styles.page}>
@@ -194,46 +239,9 @@ export default async function Page() {
                   </div>
                 ))}
               </div>
-              <p className={styles.heroFootnote}>*示例数据，仅作展示</p>
+              <p className={styles.heroFootnote}></p>
             </div>
-
-            <div id="ai" className={styles.aiCard}>
-              <div className={styles.aiCardHeader}>
-                <div className={styles.aiCardHeading}>
-                  <FiActivity size={18} />
-                  <span>今日 AI 重点</span>
-                </div>
-                <span className={styles.aiCardTag}>信心 87%</span>
-              </div>
-              <h3>Liverpool vs. Man United</h3>
-              <p>开赛时间：22:00 GMT+7</p>
-
-              <div className={styles.aiCardProbabilities}>
-                {heroProbabilities.map(({ label, value }) => (
-                  <div key={label}>
-                    <span>{label}</span>
-                    <span>{value}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.aiRecommendation}>
-                <span>推荐盘口 · FT 1X2</span>
-                <strong>Home</strong>
-                <p>
-                  AI 参考近期 xG（2.1 vs 1.2）与高压迫抢回率。市场高估德比波动；主胜具备价值。
-                </p>
-              </div>
-
-              <div className={styles.aiCardActions}>
-                <a href="#ai" className={`${styles.aiButton} ${styles.primaryAction}`}>
-                  <FiStar size={16} /> 更多 AI Picks
-                </a>
-                <a href="#ai" className={`${styles.aiButton} ${styles.secondaryAction}`}>
-                  <FiBarChart2 size={16} /> 历史命中
-                </a>
-              </div>
-            </div>
+            <AiHighlightsCarousel highlights={carouselHighlights} />
           </div>
         </section>
 
@@ -256,17 +264,21 @@ export default async function Page() {
             </div>
           </div>
           <div className={styles.oddsGrid}>
-            {oddsData.map((book) => (
-              <div key={book.brand} className={styles.oddsCard}>
+            {oddsVendors.map((book) => (
+              <div key={book.name} className={styles.oddsCard}>
                 <div className={styles.oddsCardHeader}>
                   <span className={styles.cardTitle}>
-                    <FiGlobe size={18} /> {book.brand}
+                    <FiGlobe size={18} /> {book.name}
                   </span>
                   <span className={`${styles.chip} ${styles.smallChip}`}>{book.offer}</span>
                 </div>
                 <div className={styles.oddsValues}>
-                  {book.values.map((value) => (
-                    <div key={`${book.brand}-${value.label}`} className={styles.oddsValue}>
+                  {[
+                    { label: "主胜", value: book.home },
+                    { label: "平局", value: book.draw },
+                    { label: "客胜", value: book.away },
+                  ].map((value) => (
+                    <div key={`${book.name}-${value.label}`} className={styles.oddsValue}>
                       <div className={styles.oddsLabel}>{value.label}</div>
                       <div className={styles.oddsNumber}>{value.value}</div>
                     </div>
