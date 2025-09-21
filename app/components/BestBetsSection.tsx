@@ -109,8 +109,13 @@ export function BestBetsSection() {
           
           return (
             <div key={bet.id} className={styles.bestBetCard}>
+              {/* 紧迫感指示器 */}
+              <div className={styles.urgencyIndicator}>
+                限时推荐
+              </div>
+              
               {/* League Name */}
-              <div className={styles.betLeague}>
+              <div className={styles.betMeta}>
                 {bet.league_name}
               </div>
               
@@ -125,25 +130,31 @@ export function BestBetsSection() {
                 </span>
               </div>
               
+              {/* Stats with enhanced styling */}
+              <div className={styles.betStats}>
+                <div className={styles.confidenceScore}>
+                  推荐指数 {bet.recommendation_index}
+                </div>
+                <div className={styles.predictionChip}>
+                  {bet.predicted_result}
+                </div>
+              </div>
+              
               {/* Average Odds */}
-              <div className={styles.betOdds}>
-                {bet.average_odds ? formatAverageOdds(bet.average_odds) : '赔率暂无'}
+              <div className={styles.betPick}>
+                <strong>赔率：</strong> {bet.average_odds ? formatAverageOdds(bet.average_odds) : '赔率暂无'}
               </div>
               
               {/* Recommendation Comment */}
-              <div className={styles.betComment}>
+              <div className={styles.betReason}>
                 {bet.recommendation_comment}
               </div>
               
-              {/* Recommendation Index */}
-              <div className={styles.betStats}>
-                <span className={styles.chip}>推荐指数 {bet.recommendation_index}</span>
-                <span className={styles.chip}>预测结果: {bet.predicted_result}</span>
-              </div>
-              
               <div className={styles.betActions}>
-                <button className={styles.primaryCta}>去下注（最划算）</button>
-                <a href="https://t.me/" className={styles.secondaryAction}>
+                <button className={styles.enhancedPrimaryCta}>
+                  🚀 去下注（最划算）
+                </button>
+                <a href="https://t.me/" className={styles.enhancedSecondaryAction}>
                   <FiSend size={16} /> 让 AI 跟单
                 </a>
               </div>

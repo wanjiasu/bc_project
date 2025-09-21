@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FiHeart } from 'react-icons/fi'
+import { FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import styles from '../page.module.scss'
 
 type MatchData = {
@@ -18,30 +18,59 @@ type MatchData = {
   predicted_result: string
 }
 
+type PaginationInfo = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
+type ApiResponse = {
+  matches: MatchData[]
+  pagination: PaginationInfo
+}
+
 export default function MatchesTable() {
   const [matches, setMatches] = useState<MatchData[]>([])
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchMatches()
+    fetchMatches(1)
   }, [])
 
-  const fetchMatches = async () => {
+  const fetchMatches = async (page: number) => {
     try {
       setLoading(true)
-      const response = await fetch('/api/matches')
+      const response = await fetch(`/api/matches?page=${page}&limit=10`)
       
       if (!response.ok) {
         throw new Error('Failed to fetch matches')
       }
       
-      const data = await response.json()
+      const data: ApiResponse = await response.json()
       setMatches(data.matches || [])
+      setPagination(data.pagination)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchMatches(newPage)
     }
   }
 
@@ -135,6 +164,34 @@ export default function MatchesTable() {
           )}
         </tbody>
       </table>
+      
+      {/* 分页控件 */}
+      {pagination.totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button 
+            className={`${styles.paginationBtn} ${!pagination.hasPrev ? styles.disabled : ''}`}
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={!pagination.hasPrev}
+          >
+            <FiChevronLeft size={16} />
+            上一页
+          </button>
+          
+          <div className={styles.paginationInfo}>
+            <span>第 {pagination.page} 页，共 {pagination.totalPages} 页</span>
+            <span>（共 {pagination.total} 条记录）</span>
+          </div>
+          
+          <button 
+            className={`${styles.paginationBtn} ${!pagination.hasNext ? styles.disabled : ''}`}
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={!pagination.hasNext}
+          >
+            下一页
+            <FiChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

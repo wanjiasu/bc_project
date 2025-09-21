@@ -39,4 +39,7 @@ pnpm install
 pnpm run build
 
 pnpm run start
+
+nohup pnpm start > start.log 2>&1 &
+pkill -f "pnpm start"
 ```

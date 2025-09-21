@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '../../../src/lib/postgres'
 
 export type MatchData = {
@@ -15,7 +15,19 @@ export type MatchData = {
   predicted_result: string
 }
 
-export async function GET() {
+export type PaginatedResponse = {
+  matches: MatchData[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
+
+export async function GET(request: NextRequest) {
   const db = getPool()
   
   if (!db) {
@@ -23,6 +35,26 @@ export async function GET() {
   }
 
   try {
+    // 获取分页参数
+    const { searchParams } = new URL(request.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10')))
+    const offset = (page - 1) * limit
+
+    // 获取总数
+    const countResult = await db.query(`
+      SELECT COUNT(*) as total
+      FROM ai_eval
+      WHERE recommendation_index IS NOT NULL 
+        AND predicted_result IS NOT NULL 
+        AND ai_response IS NOT NULL
+        AND fixture_id IS NOT NULL
+    `)
+    
+    const total = parseInt(countResult.rows[0]?.total || '0')
+    const totalPages = Math.ceil(total / limit)
+
+    // 获取分页数据
     const { rows } = await db.query(`
       SELECT 
         fixture_id,
@@ -35,8 +67,8 @@ export async function GET() {
         AND ai_response IS NOT NULL
         AND fixture_id IS NOT NULL
       ORDER BY recommendation_index DESC
-      LIMIT 50
-    `)
+      LIMIT $1 OFFSET $2
+    `, [limit, offset])
 
     const matches: MatchData[] = rows.map((row: any) => {
       let aiResponse: any = {}
@@ -76,7 +108,19 @@ export async function GET() {
       match.away_team
     )
 
-    return NextResponse.json({ matches })
+    const response: PaginatedResponse = {
+      matches,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Failed to fetch matches:', error)
     return NextResponse.json({ error: 'Failed to fetch matches data' }, { status: 500 })
