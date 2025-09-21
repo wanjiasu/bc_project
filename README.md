@@ -42,4 +42,7 @@ pnpm run start
 
 nohup pnpm start > start.log 2>&1 &
 pkill -f "pnpm start"
+
+ps aux | grep next
+pkill -9 <pid>
 ```

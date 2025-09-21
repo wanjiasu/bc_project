@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { FiX, FiExternalLink } from 'react-icons/fi'
+import Image from 'next/image'
 import QRCode from 'qrcode'
 import styles from './TelegramQRModal.module.scss'
 
@@ -19,11 +20,27 @@ export default function TelegramQRModal({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('')
   const modalRef = useRef<HTMLDivElement>(null)
 
+  const generateQRCode = useCallback(async () => {
+    try {
+      const dataUrl = await QRCode.toDataURL(telegramUrl, {
+        width: 256,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      })
+      setQrCodeDataUrl(dataUrl)
+    } catch (error) {
+      console.error('生成二维码失败:', error)
+    }
+  }, [telegramUrl])
+
   useEffect(() => {
     if (isOpen && telegramUrl) {
       generateQRCode()
     }
-  }, [isOpen, telegramUrl])
+  }, [isOpen, telegramUrl, generateQRCode])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -51,22 +68,6 @@ export default function TelegramQRModal({
     }
   }, [isOpen, onClose])
 
-  const generateQRCode = async () => {
-    try {
-      const dataUrl = await QRCode.toDataURL(telegramUrl, {
-        width: 256,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      })
-      setQrCodeDataUrl(dataUrl)
-    } catch (error) {
-      console.error('生成二维码失败:', error)
-    }
-  }
-
   const handleDirectOpen = () => {
     window.open(telegramUrl, '_blank')
   }
@@ -86,10 +87,12 @@ export default function TelegramQRModal({
         <div className={styles.content}>
           <div className={styles.qrSection}>
             {qrCodeDataUrl ? (
-              <img 
+              <Image 
                 src={qrCodeDataUrl} 
                 alt="Telegram 机器人二维码" 
                 className={styles.qrCode}
+                width={256}
+                height={256}
               />
             ) : (
               <div className={styles.qrPlaceholder}>
@@ -103,7 +106,7 @@ export default function TelegramQRModal({
             <ol>
               <li>使用手机 Telegram 扫描上方二维码</li>
               <li>或者点击下方按钮直接打开</li>
-              <li>点击 "Start" 开始与机器人对话</li>
+              <li>点击 &quot;Start&quot; 开始与机器人对话</li>
               <li>获取专属的 AI 投注建议和实时提醒</li>
             </ol>
           </div>
