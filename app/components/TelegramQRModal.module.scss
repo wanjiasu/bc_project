@@ -1,0 +1,222 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 0;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #666;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f5f5f5;
+    color: #333;
+  }
+}
+
+.content {
+  padding: 0 24px 24px;
+}
+
+.qrSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.qrCode {
+  width: 256px;
+  height: 256px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qrPlaceholder {
+  width: 256px;
+  height: 256px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #e0e0e0;
+}
+
+.loading {
+  color: #666;
+  font-size: 14px;
+}
+
+.instructions {
+  margin-bottom: 24px;
+  
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 12px 0;
+  }
+  
+  ol {
+    margin: 0;
+    padding-left: 20px;
+    
+    li {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.actions {
+  margin-bottom: 20px;
+}
+
+.directButton {
+  width: 100%;
+  background: #0088cc;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #0077b3;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.note {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin: 0;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .overlay {
+    padding: 16px;
+  }
+  
+  .modal {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+  
+  .header {
+    padding: 20px 20px 0;
+  }
+  
+  .content {
+    padding: 0 20px 20px;
+  }
+  
+  .title {
+    font-size: 18px;
+  }
+  
+  .qrCode,
+  .qrPlaceholder {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .instructions {
+    h3 {
+      font-size: 15px;
+    }
+    
+    ol li {
+      font-size: 13px;
+    }
+  }
+  
+  .directButton {
+    font-size: 15px;
+    padding: 12px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .qrCode,
+  .qrPlaceholder {
+    width: 180px;
+    height: 180px;
+  }
+}
