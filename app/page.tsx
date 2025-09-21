@@ -345,7 +345,7 @@ export default async function Page() {
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>所有比赛 · 一站式可下注</h1>
             <p className={styles.heroDescription}>
-              聚合主流联赛与电竞盘口，<strong>AI 给出"最有把握"投注建议</strong>，并提示"最划算渠道"。
+              聚合主流联赛与电竞盘口，<strong>AI 给出&ldquo;最有把握&rdquo;投注建议</strong>，并提示&ldquo;最划算渠道&rdquo;。
             </p>
           </div>
           <aside className={styles.aiCard}>
