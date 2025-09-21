@@ -21,6 +21,7 @@ import type { AiHighlight } from "src/lib/postgres"
 import { UserMenuServerWrapper } from "src/components/Header/UserMenuServerWrapper"
 import { AiHighlightsSection } from "./components/AiHighlightsSection"
 import { BestBetsSection } from "./components/BestBetsSection"
+import MatchesTable from "./components/MatchesTable"
 import styles from "./page.module.scss"
 
 const navItems = [
@@ -295,17 +296,8 @@ export default async function Page() {
             ))}
           </nav>
           <div className={styles.ctaGroup}>
-            <select className={`${styles.langSelect} ${styles.hideOnMobile}`}>
-              <option>简体中文</option>
-              <option>English</option>
-              <option>ไทย</option>
-              <option>Bahasa</option>
-              <option>Português (BR)</option>
-              <option>Español</option>
-            </select>
-            <UserMenuServerWrapper user={session?.user ?? null} />
-            <a href="#" className={styles.primaryCta}>
-              免费开始
+            <a href="/login" className={styles.primaryCta}>
+              登录
             </a>
           </div>
         </div>
@@ -425,47 +417,7 @@ export default async function Page() {
           </div>
 
           {/* Matches Table */}
-          <div className={styles.matchesTable}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>时间</th>
-                  <th>运动</th>
-                  <th>联赛</th>
-                  <th>对阵</th>
-                  <th>主胜</th>
-                  <th>平/让</th>
-                  <th>客胜</th>
-                  <th>AI</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {matches.map((match) => (
-                  <tr key={match.id}>
-                    <td>{new Date(match.ts).toTimeString().slice(0, 5)}</td>
-                    <td>{match.sport}</td>
-                    <td>{match.league}</td>
-                    <td>
-                      <button className={styles.favBtn}>
-                        <FiHeart size={16} />
-                      </button>
-                      <span className={styles.matchTeams}>
-                        {match.home} <span>vs</span> {match.away}
-                      </span>
-                    </td>
-                    <td>{match.odds[0] === '-' ? '-' : Number(match.odds[0]).toFixed(2)}</td>
-                    <td>{match.odds[1] === '-' ? '-' : Number(match.odds[1]).toFixed(2)}</td>
-                    <td>{match.odds[2] === '-' ? '-' : Number(match.odds[2]).toFixed(2)}</td>
-                    <td>{match.ai}</td>
-                    <td>
-                      <button className={styles.dealBtn}>最划算渠道</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <MatchesTable />
         </section>
 
         {/* SEO Content Hub */}
