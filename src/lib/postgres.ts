@@ -44,7 +44,7 @@ function getConnectionString(): string | null {
   return null
 }
 
-function getPool(): Pool | null {
+export function getPool(): Pool | null {
   if (pool) return pool
   if (globalForDb.__authDbPool) {
     debugLog("Reusing cached connection pool")

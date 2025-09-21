@@ -761,15 +761,455 @@
   }
 }
 
-@media (min-width: 768px) {
-  .sectionHeaderTop {
-    flex-direction: row;
-    align-items: center;
-  }
+/* 新增样式 - 匹配参考设计 */
 
-  .footerTop {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+/* Header 更新 */
+.ctaGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.langSelect {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  color: #f8fafc;
+  min-width: 100px;
+}
+
+.primaryCta {
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Promo Banners */
+.promoBanners {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bannersGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.promoBanner {
+  @extend .glass;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bannerTag {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.25rem;
+}
+
+.bannerTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.bannerSub {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.secondaryAction {
+  @extend .glass;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+/* Hero Section 更新 */
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.heroDescription {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+}
+
+.aiCardHeading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #f8fafc;
+}
+
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.primaryAction {
+  background: #ffffff;
+  color: #0b1220;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.heroFootnote {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+}
+
+/* AI Best Bets */
+.sectionNote {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bestBetsGrid {
+  @extend .container;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.bestBetCard {
+  @extend .glass;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.betMeta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.betTeams {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.betStats {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.betPick {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.betReason {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1rem;
+}
+
+.betActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Filters and Table */
+.favFilter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.filtersCard {
+  @extend .glass;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.filtersGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.filterLabel {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.filterSelect,
+.filterInput {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: #f8fafc;
+  width: 100%;
+}
+
+.filterInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.matchesTable {
+  margin-top: 1.5rem;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.favBtn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.matchTeams {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.matchTeams span {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dealBtn {
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+/* Articles Grid */
+.articlesGrid {
+  @extend .container;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.articleCard {
+  @extend .glass;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.articleDate {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.articleTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.articleTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Footer 更新 */
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footerChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.footerChips .chip {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+}
+
+/* 响应式设计 */
+@media (min-width: 640px) {
+  .bannersGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
+  
+  .heroActions {
+    flex-direction: row;
+  }
+  
+  .betActions {
+    flex-direction: row;
+  }
+  
+  .bestBetsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .articlesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .footerContent {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bestBetsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .articlesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 新增样式用于 BestBetsSection */
+.betLeague {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.betTeams {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  
+  .vs {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin: 0 0.5rem;
+  }
+}
+
+.highlightedTeam {
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb), 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.betOdds {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+.betComment {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  background: rgba(var(--accent-primary-rgb), 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-primary);
+  
+  /* 添加滚动条样式 */
+  max-height: 120px; /* 限制最大高度 */
+  overflow-y: auto; /* 垂直滚动 */
+  
+  /* 自定义滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(var(--text-secondary-rgb), 0.1);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-primary-rgb), 0.3);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(var(--accent-primary-rgb), 0.5);
+    }
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }

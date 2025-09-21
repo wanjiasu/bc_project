@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Betaione · 智能下注门户（重设计 Demo）</title>
+  <meta name="description" content="Betaione：聚合全部比赛可下注入口 + AI 最佳推荐 + Telegram 助手 + Facebook 抽奖 + SEO 内容中心。">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme:{ extend:{ colors:{ bg1:'#0B1224', bg2:'#0E1630', brand:'#6EE7F9', accent:'#A5B4FC', ink:'#E5EAF5', good:'#34D399', warn:'#F59E0B' }, boxShadow:{ soft:'0 8px 30px rgba(0,0,0,.25)' }}} }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body{background:linear-gradient(#0B1224,#0E1630);color:#E5EAF5}
+    .glass{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+    .chip{background:rgba(255,255,255,.12)}
+    .btn{border-radius:14px;padding:.6rem 1rem;font-weight:700}
+    .btn-primary{background:#fff;color:#0B1224}
+    .btn-secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
+    .grad-text{background:linear-gradient(90deg,#A5B4FC,#6EE7F9);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .fav-on{color:#34d399}
+    .banner{min-height:110px}
+    .table th, .table td{padding:.65rem .75rem}
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-bg1/80 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-8 h-8 rounded-2xl overflow-hidden">
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A5B4FC"/><stop offset="100%" stop-color="#6EE7F9"/></linearGradient></defs>
+            <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#g1)"/>
+            <text x="50%" y="57%" text-anchor="middle" dominant-baseline="middle" font-family="Inter,system-ui" font-weight="900" font-size="280" fill="#0B1224">β</text>
+          </svg>
+        </span>
+        <b>Betaione</b>
+        <span class="chip px-2 py-0.5 rounded text-[11px] ml-2 hidden sm:inline">Demo</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-white/80">
+        <a href="#best" class="hover:text-white">AI 最佳推荐</a>
+        <a href="#all" class="hover:text-white">全部比赛</a>
+        <a href="#seo" class="hover:text-white">内容中心</a>
+        <a href="#promos" class="hover:text-white">活动</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <select id="lang" class="glass rounded-xl px-2 py-1 text-xs">
+          <option>简体中文</option><option>English</option><option>ไทย</option><option>Bahasa</option><option>Português (BR)</option><option>Español</option>
+        </select>
+        <a href="#" class="btn btn-secondary hidden sm:inline">登录</a>
+        <a href="#" class="btn btn-primary">免费开始</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top banners: Telegram + Facebook weekly raffle (configurable) -->
+  <section id="promos" class="border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 grid md:grid-cols-2 gap-3">
+      <div id="bannerA" class="banner glass rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs opacity-70 mb-1">AI 投注助理</div>
+          <div class="text-lg font-extrabold">添加 Telegram，领专属下注建议</div>
+          <div class="text-xs opacity-70 mt-1">赛前提醒 · 实时盘口变动 · 风险提示</div>
+        </div>
+        <a href="https://t.me/" class="btn btn-primary whitespace-nowrap inline-flex items-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> 立即添加</a>
+      </div>
+      <div id="bannerB" class="banner glass rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs opacity-70 mb-1">每周关注抽奖</div>
+          <div class="text-lg font-extrabold">关注 Facebook，周周送福利</div>
+          <div class="text-xs opacity-70 mt-1">关注即可参与 · 实名后自动加权</div>
+        </div>
+        <a href="https://facebook.com/" class="btn btn-secondary whitespace-nowrap inline-flex items-center gap-2"><i data-lucide="gift" class="w-4 h-4"></i> 去关注</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0" style="background:radial-gradient(ellipse at top, rgba(165,180,252,.18), transparent 60%);"></div>
+    <div class="relative max-w-7xl mx-auto px-4 py-10 grid lg:grid-cols-3 gap-6 items-start">
+      <div class="lg:col-span-2">
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">所有比赛 · 一站式可下注</h1>
+        <p class="mt-3 text-white/80">聚合主流联赛与电竞盘口，<b>AI 给出“最有把握”投注建议</b>，并提示“最划算渠道”。</p>
+      </div>
+      <aside class="glass rounded-2xl p-5">
+        <div class="text-sm opacity-80 mb-2">AI 投注助理（Telegram）</div>
+        <p class="text-sm text-white/75">把你关注的球队加到清单，AI 会根据盘口变动和历史模型，推送合适的下注窗口。</p>
+        <a href="https://t.me/" class="btn btn-primary mt-3 w-full inline-flex items-center justify-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> 添加 Telegram</a>
+        <a href="https://facebook.com/" class="btn btn-secondary mt-2 w-full inline-flex items-center justify-center gap-2"><i data-lucide="facebook" class="w-4 h-4"></i> 关注 Facebook 抽奖</a>
+        <p class="text-[11px] opacity-50 mt-2">* 演示页。请遵循当地法律与 18+ 责任博彩。</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- AI Best Bets -->
+  <section id="best" class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5"></i> AI 最有把握的投注</h2>
+      <div class="text-xs opacity-70">实时性：示例静态数据（接 API 后将自动刷新）</div>
+    </div>
+    <div id="bestGrid" class="grid md:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- All Matches -->
+  <section id="all" class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2"><i data-lucide="list-filter" class="w-5 h-5"></i> 全部比赛</h2>
+      <label class="text-xs flex items-center gap-2"><input type="checkbox" id="onlyFav" class="accent-brand"> 只看关注</label>
+    </div>
+
+    <!-- Filters -->
+    <div class="glass rounded-2xl p-4">
+      <div class="grid md:grid-cols-5 gap-3 text-sm">
+        <div>
+          <div class="opacity-80 mb-1">运动</div>
+          <select id="f-sport" class="w-full glass rounded-xl px-3 py-2">
+            <option value="">全部</option>
+            <option>soccer</option><option>basketball</option><option>esports</option><option>tennis</option>
+          </select>
+        </div>
+        <div>
+          <div class="opacity-80 mb-1">地区</div>
+          <select id="f-region" class="w-full glass rounded-xl px-3 py-2">
+            <option value="">全部</option>
+            <option>TH</option><option>ID</option><option>VN</option><option>MY</option><option>BR</option><option>MX</option><option>AR</option>
+          </select>
+        </div>
+        <div>
+          <div class="opacity-80 mb-1">时间</div>
+          <select id="f-time" class="w-full glass rounded-xl px-3 py-2">
+            <option value="">全部</option>
+            <option value="today">今天</option>
+            <option value="24h">24 小时内</option>
+          </select>
+        </div>
+        <div>
+          <div class="opacity-80 mb-1">联赛</div>
+          <input id="f-league" class="w-full glass rounded-xl px-3 py-2" placeholder="THA L1 / Série A / UCL"/>
+        </div>
+        <div>
+          <div class="opacity-80 mb-1">搜索</div>
+          <input id="f-q" class="w-full glass rounded-xl px-3 py-2" placeholder="队名/盘口"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="mt-4 glass rounded-2xl overflow-x-auto">
+      <table class="min-w-full text-sm table">
+        <thead class="text-white/80">
+          <tr class="border-b border-white/10">
+            <th class="text-left">时间</th><th class="text-left">运动</th><th class="text-left">联赛</th><th class="text-left">对阵</th><th class="text-left">主胜</th><th class="text-left">平/让</th><th class="text-left">客胜</th><th class="text-left">AI</th><th class="text-left">操作</th>
+          </tr>
+        </thead>
+        <tbody id="matchBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SEO content hub -->
+  <section id="seo" class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2"><i data-lucide="newspaper" class="w-5 h-5"></i> 内容中心（SEO）</h2>
+      <div class="text-xs opacity-70">支持自动更新到此区域</div>
+    </div>
+    <div id="seoList" class="grid md:grid-cols-3 gap-4"></div>
+  </section>
+
+  <footer class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-8 text-sm text-white/70">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="chip px-2 py-0.5 rounded">18+ 责任博彩</span>
+          <span class="chip px-2 py-0.5 rounded">SEA & LATAM</span>
+          <a class="chip px-2 py-0.5 rounded" href="https://t.me/">Telegram</a>
+          <a class="chip px-2 py-0.5 rounded" href="https://facebook.com/">Facebook</a>
+        </div>
+        <div class="text-xs opacity-60">演示页面 · 数据为示例 · 请遵循当地法律</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: 渠道选择 / 最划算 -->
+  <div id="dealModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#101830] rounded-2xl max-w-lg w-full p-6 border border-white/10">
+      <div class="flex items-center justify-between">
+        <div class="text-lg font-bold">最划算渠道</div>
+        <button onclick="closeDeal()" class="text-white/70 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="dealContent" class="mt-4 space-y-3 text-sm"></div>
+      <p class="text-[11px] text-white/50 mt-3">根据渠道福利与当前赔率折算为“等效赔率”。</p>
+    </div>
+  </div>
+
+  <script>
+    const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>Array.from(p.querySelectorAll(s));
+    try{lucide.createIcons()}catch(e){}
+
+    // ---------- Configurable banners (运营可控) ----------
+    const banners=[
+      {id:'A', title:'添加 Telegram，领专属下注建议', sub:'赛前提醒 · 盘口变动 · 风险提示', cta:'立即添加', link:'https://t.me/', grad:'from-accent to-brand'},
+      {id:'B', title:'关注 Facebook，周周送福利', sub:'关注即可参与 · 实名后自动加权', cta:'去关注', link:'https://facebook.com/', grad:'from-brand to-accent'}
+    ];
+    let bannerIdx=0;
+    setInterval(()=>{
+      bannerIdx=(bannerIdx+1)%banners.length;
+      const b=banners[bannerIdx];
+      const el=b.id==='A'?$('#bannerA'):$('#bannerB');
+      el.style.backgroundImage='linear-gradient(90deg, rgba(165,180,252,.08), rgba(110,231,249,.08))';
+    },6000);
+
+    // ---------- Data seeds (replace by APIs) ----------
+    const bestBets=[
+      {id:'e1', sport:'soccer', league:'THA League 1', region:'TH', time:'22:00', teams:'Buriram vs BG', prob:0.61, edge:+0.07, pick:'主胜 (-0.5)', stake:'2/5', reason:'主队近期 xG 2.0 对 1.1；盘口微降；赔率仍有 7% 价值'},
+      {id:'e2', sport:'soccer', league:'Série A', region:'BR', time:'07:30', teams:'Flamengo vs Palmeiras', prob:0.58, edge:+0.05, pick:'主胜 DNB', stake:'2/5', reason:'主强客强但主场加成明显；平局保护'},
+      {id:'e3', sport:'esports', league:'LOL LCK', region:'SEA', time:'18:00', teams:'GenG vs T1', prob:0.57, edge:+0.06, pick:'GenG -1.5 地图', stake:'1/5', reason:'近期对位强势与滚盘节奏优势'}
+    ];
+    const matches=[
+      {id:'e1', ts: Date.now()+2*3600e3, sport:'soccer', region:'TH', league:'THA League 1', home:'Buriram', away:'BG Pathum', odds:[1.95,3.30,3.70], ai:'主胜 61%', favIds:['BUR']},
+      {id:'e2', ts: Date.now()+9*3600e3, sport:'soccer', region:'BR', league:'Série A', home:'Flamengo', away:'Palmeiras', odds:[2.10,3.10,3.20], ai:'主胜 DNB 58%'},
+      {id:'e3', ts: Date.now()+5*3600e3, sport:'esports', region:'SEA', league:'LOL LCK', home:'GenG', away:'T1', odds:[1.80, '-', 2.00], ai:'GenG -1.5 57%'},
+      {id:'e4', ts: Date.now()+26*3600e3, sport:'basketball', region:'MX', league:'Liga Nacional', home:'CDMX', away:'Monterrey', odds:[1.85,'-',2.05], ai:'大分 210.5 54%'},
+      {id:'e5', ts: Date.now()+1*3600e3, sport:'tennis', region:'AR', league:'ATP Challenger', home:'Diaz', away:'Gomez', odds:[1.70,'-',2.20], ai:'主胜 56%'}
+    ];
+    const articles=[
+      {id:201, title:'[TH] 今晚 3 场性价比汇总', tag:['Value','等效赔率'], date:new Date().toISOString()},
+      {id:202, title:'[BR Série A] 主胜价值票：弗拉门戈 vs 帕尔梅拉斯', tag:['主胜','盘口背离'], date:new Date(Date.now()-3600e3).toISOString()},
+      {id:203, title:'[电竞] 今日 2 场稳胆 & 1 场冷门', tag:['LOL','CS2'], date:new Date(Date.now()-7200e3).toISOString()},
+    ];
+
+    // ---------- Best Bets render ----------
+    function renderBest(){
+      const wrap=$('#bestGrid'); wrap.innerHTML='';
+      bestBets.forEach(x=>{
+        const el=document.createElement('div');
+        el.className='glass rounded-2xl p-4';
+        const edge=(x.edge*100).toFixed(0);
+        el.innerHTML=`
+          <div class="text-xs opacity-70 mb-1">${x.region} · ${x.league} · ${x.time}</div>
+          <div class="font-bold">${x.teams}</div>
+          <div class="mt-1 text-sm"><span class="chip px-2 py-0.5 rounded">胜率 ${(x.prob*100).toFixed(0)}%</span> <span class="chip px-2 py-0.5 rounded">价值 +${edge}%</span></div>
+          <div class="mt-2 text-sm"><b>AI 建议：</b>${x.pick} · <span class="opacity-80">资金管理：${x.stake}</span></div>
+          <div class="mt-2 text-xs text-white/80">理由：${x.reason}</div>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button class="btn btn-primary" onclick="openDeal('${x.id}')">去下注（最划算）</button>
+            <a class="btn btn-secondary inline-flex items-center justify-center gap-2" href="https://t.me/"><i data-lucide="send" class="w-4 h-4"></i> 让 AI 跟单</a>
+          </div>`;
+        wrap.appendChild(el);
+      });
+      try{lucide.createIcons()}catch(e){}
+    }
+
+    // ---------- Matches render + filters ----------
+    const LS_FAV='betaione:favTeams';
+    const fav=()=>{try{return JSON.parse(localStorage.getItem(LS_FAV)||'{}')}catch(e){return {}}};
+    const setFav=o=>localStorage.setItem(LS_FAV,JSON.stringify(o));
+
+    function matchRow(m){
+      const t=new Date(m.ts);
+      const favMap=fav();
+      const favKey=m.home, isFav=!!favMap[favKey];
+      const oddsA = m.odds.map(o=> o==='-'?'-':Number(o).toFixed(2));
+      return `<tr class="border-b border-white/10">
+        <td>${t.toTimeString().slice(0,5)}</td>
+        <td>${m.sport}</td>
+        <td>${m.league}</td>
+        <td class="whitespace-nowrap">
+          <button class="favBtn ${isFav?'fav-on':''}" data-team="${favKey}" title="${isFav?'已关注':'关注'}"><i data-lucide="heart" class="w-4 h-4"></i></button>
+          <span class="ml-1">${m.home} <span class="opacity-60">vs</span> ${m.away}</span>
+        </td>
+        <td>${oddsA[0]}</td>
+        <td>${oddsA[1]}</td>
+        <td>${oddsA[2]}</td>
+        <td>${m.ai||''}</td>
+        <td><button class="btn btn-secondary text-xs" onclick="openDeal('${m.id}')">最划算渠道</button></td>
+      </tr>`;
+    }
+
+    function applyFilters(){
+      const sport=$('#f-sport').value, region=$('#f-region').value, time=$('#f-time').value;
+      const league=$('#f-league').value.toLowerCase(), q=$('#f-q').value.toLowerCase();
+      const onlyFav=$('#onlyFav').checked;
+      const now=Date.now();
+      let arr=matches.filter(m=>
+        (!sport || m.sport===sport) &&
+        (!region || m.region===region) &&
+        (!league || m.league.toLowerCase().includes(league)) &&
+        (!q || [m.home,m.away,m.league].join(' ').toLowerCase().includes(q)) &&
+        (!time || (time==='today' ? (new Date(m.ts).getDate()===new Date().getDate()) : (m.ts-now<=24*3600e3)))
+      );
+      if(onlyFav){
+        const favMap=fav(); arr=arr.filter(m=>!!favMap[m.home]);
+      }
+      const body=$('#matchBody'); body.innerHTML=arr.map(matchRow).join('');
+      try{lucide.createIcons()}catch(e){}
+    }
+
+    document.addEventListener('input', (e)=>{
+      if(['f-sport','f-region','f-time','f-league','f-q','onlyFav'].includes(e.target.id)) applyFilters();
+    });
+
+    document.addEventListener('click', (e)=>{
+      const btn=e.target.closest('.favBtn');
+      if(btn){
+        const id=btn.dataset.team; const o=fav(); o[id]?delete o[id]:o[id]=true; setFav(o); applyFilters();
+      }
+    });
+
+    // ---------- Deals modal (mock effective odds) ----------
+    function openDeal(id){
+      const book = [
+        {name:'1xBet', odds:'1.95', promo:'首充100% / 变体：等效 2.05', link:'#'},
+        {name:'Parimatch', odds:'1.93', promo:'返现 10% / 等效 2.02', link:'#'},
+        {name:'Betano', odds:'1.92', promo:'串关加成 5% / 等效 2.01', link:'#'}
+      ];
+      const box=$('#dealContent'); box.innerHTML='';
+      book.forEach(b=>{
+        const row=document.createElement('div');
+        row.className='glass rounded-xl p-3 flex items-center justify-between';
+        row.innerHTML=`<div><div class="font-semibold">${b.name}</div><div class="text-xs opacity-70">赔率 ${b.odds} · ${b.promo}</div></div><a href="${b.link}" class="btn btn-primary text-sm">前往</a>`;
+        box.appendChild(row);
+      });
+      const m=$('#dealModal'); m.classList.remove('hidden'); m.classList.add('flex');
+      try{lucide.createIcons()}catch(e){}
+    }
+    function closeDeal(){ const m=$('#dealModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    window.openDeal=openDeal; window.closeDeal=closeDeal;
+
+    // ---------- SEO list render ----------
+    function renderSEO(){
+      const wrap=$('#seoList'); wrap.innerHTML='';
+      articles.forEach(a=>{
+        const el=document.createElement('a');
+        el.href='#'; el.className='glass rounded-2xl p-4 block hover:border-white/30';
+        el.innerHTML=`<div class="text-xs opacity-70 mb-1">${new Date(a.date).toLocaleString()}</div><div class="font-bold mb-2">${a.title}</div><div class="flex flex-wrap gap-2 text-xs">${a.tag.map(t=>'<span class="chip px-2 py-0.5 rounded">'+t+'</span>').join('')}</div>`;
+        wrap.appendChild(el);
+      });
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', ()=>{
+      renderBest();
+      applyFilters();
+      renderSEO();
+    });
+  </script>
+</body>
+</html>

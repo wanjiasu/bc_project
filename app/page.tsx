@@ -6,6 +6,13 @@ import {
   FiShield,
   FiTrendingUp,
   FiUsers,
+  FiSend,
+  FiBox,
+  FiStar,
+  FiFilter,
+  FiFileText,
+  FiHeart,
+  FiX,
 } from "react-icons/fi"
 
 import { auth } from "auth"
@@ -13,14 +20,109 @@ import { fetchTopAiRecommendations } from "src/lib/postgres"
 import type { AiHighlight } from "src/lib/postgres"
 import { UserMenuServerWrapper } from "src/components/Header/UserMenuServerWrapper"
 import { AiHighlightsSection } from "./components/AiHighlightsSection"
+import { BestBetsSection } from "./components/BestBetsSection"
 import styles from "./page.module.scss"
 
 const navItems = [
-  { label: "AI 预测", href: "#ai" },
-  { label: "赔率对比", href: "#odds" },
-  { label: "羊毛中心", href: "#promos" },
-  { label: "比分&赛程", href: "#scores" },
-  { label: "加入社群", href: "#social" },
+  { label: "AI 最佳推荐", href: "#best" },
+  { label: "全部比赛", href: "#all" },
+  { label: "内容中心", href: "#seo" },
+  { label: "活动", href: "#promos" },
+]
+
+// 添加新的数据结构 - 更新为匹配 API 返回格式
+type BestBetData = {
+  id: string
+  recommendation_index: number
+  recommendation_comment: string
+  predicted_result: string
+  league_name: string
+  home_team: string
+  away_team: string
+  average_odds: {
+    Home: number
+    Draw: number
+    Away: number
+  }
+}
+
+const matches = [
+  {
+    id: 'e1',
+    ts: Date.now() + 2 * 3600000,
+    sport: 'soccer',
+    region: 'TH',
+    league: 'THA League 1',
+    home: 'Buriram',
+    away: 'BG Pathum',
+    odds: [1.95, 3.30, 3.70],
+    ai: '主胜 61%'
+  },
+  {
+    id: 'e2',
+    ts: Date.now() + 9 * 3600000,
+    sport: 'soccer',
+    region: 'BR',
+    league: 'Série A',
+    home: 'Flamengo',
+    away: 'Palmeiras',
+    odds: [2.10, 3.10, 3.20],
+    ai: '主胜 DNB 58%'
+  },
+  {
+    id: 'e3',
+    ts: Date.now() + 5 * 3600000,
+    sport: 'esports',
+    region: 'SEA',
+    league: 'LOL LCK',
+    home: 'GenG',
+    away: 'T1',
+    odds: [1.80, '-', 2.00],
+    ai: 'GenG -1.5 57%'
+  },
+  {
+    id: 'e4',
+    ts: Date.now() + 26 * 3600000,
+    sport: 'basketball',
+    region: 'MX',
+    league: 'Liga Nacional',
+    home: 'CDMX',
+    away: 'Monterrey',
+    odds: [1.85, '-', 2.05],
+    ai: '大分 210.5 54%'
+  },
+  {
+    id: 'e5',
+    ts: Date.now() + 1 * 3600000,
+    sport: 'tennis',
+    region: 'AR',
+    league: 'ATP Challenger',
+    home: 'Diaz',
+    away: 'Gomez',
+    odds: [1.70, '-', 2.20],
+    ai: '主胜 56%'
+  }
+]
+
+const articles = [
+  {
+    id: 201,
+    title: '[TH] 今晚 3 场性价比汇总',
+    tag: ['Value', '等效赔率'],
+    date: new Date().toISOString()
+  },
+  {
+    id: 202,
+    title: '[BR Série A] 主胜价值票：弗拉门戈 vs 帕尔梅拉斯',
+    tag: ['主胜', '盘口背离'],
+    date: new Date(Date.now() - 3600000).toISOString()
+  },
+  {
+    id: 203,
+    title: '[电竞] 今日 2 场稳胆 & 1 场冷门',
+    tag: ['LOL', 'CS2'],
+    date: new Date(Date.now() - 7200000).toISOString()
+  }
 ]
 
 const heroMetrics = [
@@ -141,7 +243,6 @@ export default async function Page() {
       homeTeam: "Liverpool",
       awayTeam: "Man United",
       fixtureId: "fixture-fallback-1",
-// 删除重复的 fixtureDate 属性，因为在上面已经定义过了
       institutionOdds: [
         {
           name: "10Bet",
@@ -178,12 +279,13 @@ export default async function Page() {
 
   return (
     <div className={styles.page}>
+      {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <div className={styles.logo}>
-            <span className={styles.logoBadge}>AI</span>
-            <span>SmartBet Hub</span>
-            <span className={`${styles.logoTag} ${styles.hideOnMobile}`}>MVP</span>
+            <span className={styles.logoBadge}>β</span>
+            <span>Betaione</span>
+            <span className={`${styles.logoTag} ${styles.hideOnMobile}`}>Demo</span>
           </div>
           <nav className={styles.nav}>
             {navItems.map((item) => (
@@ -192,100 +294,204 @@ export default async function Page() {
               </a>
             ))}
           </nav>
-          <UserMenuServerWrapper user={session?.user ?? null} />
+          <div className={styles.ctaGroup}>
+            <select className={`${styles.langSelect} ${styles.hideOnMobile}`}>
+              <option>简体中文</option>
+              <option>English</option>
+              <option>ไทย</option>
+              <option>Bahasa</option>
+              <option>Português (BR)</option>
+              <option>Español</option>
+            </select>
+            <UserMenuServerWrapper user={session?.user ?? null} />
+            <a href="#" className={styles.primaryCta}>
+              免费开始
+            </a>
+          </div>
         </div>
       </header>
 
-      <main>
-        <AiHighlightsSection
-          highlights={carouselHighlights}
-          metrics={heroMetrics}
-          fallbackOdds={fallbackOddsVendors}
-        />
-
-        <section id="promos" className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>
-              <FiGift size={20} /> 羊毛中心 · 今日福利
-            </h2>
-          </div>
-          <div className={styles.promotionsGrid}>
-            {promotions.map((promo) => (
-              <div key={promo.title} className={styles.promoCard}>
-                <div className={styles.promoMeta}>
-                  <span className={styles.chip}>{promo.tag}</span>
-                  <span>{promo.brand}</span>
-                </div>
-                <div>
-                  <div className={styles.promoTitle}>{promo.title}</div>
-                  <p>{promo.description}</p>
-                </div>
-                <a href="#" className={styles.promoAction}>
-                  {promo.action}
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="scores" className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>
-              <FiActivity size={20} /> 实时比分 &amp; 赛程
-            </h2>
-          </div>
-          <div className={styles.scoresGrid}>
-            {scoreCards.map((card) => (
-              <div key={card.league} className={styles.scoreCard}>
-                <div className={styles.scoreMeta}>{card.league}</div>
-                <div className={styles.scoreMatch}>
-                  <div className={styles.scoreTeams}>
-                    {card.teams.map((team) => (
-                      <span key={team}>{team}</span>
-                    ))}
-                  </div>
-                  <div className={styles.scoreInfo}>
-                    <span className={styles.metricLabel}>{card.status}</span>
-                    <strong>{card.score}</strong>
-                    <span className={styles.metricLabel}>{card.time}</span>
-                  </div>
-                </div>
-                <a href="#" className={styles.promoAction}>
-                  查看盘口
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="social" className={styles.section}>
-          <div className={styles.socialSection}>
-            <div className={styles.socialCard}>
+      {/* Promo Banners */}
+      <section id="promos" className={styles.promoBanners}>
+        <div className={styles.container}>
+          <div className={styles.bannersGrid}>
+            <div className={styles.promoBanner}>
               <div>
-                <h3 className={styles.sectionTitle}>
-                  <FiLink size={20} /> 加入社群 &amp; 代理计划
-                </h3>
-                <p>
-                  Line / Telegram / WhatsApp 一键加入，获取每日 AI 预测与独家福利。成为代理可获得分佣、专属内容包与私域运营支持。
-                </p>
-                <div className={styles.socialActions}>
-                  <a href="#" className={styles.primaryBtn}>
-                    加入玩家社群
-                  </a>
-                  <a href="#" className={styles.secondaryBtn}>
-                    申请成为代理
-                  </a>
-                </div>
+                <div className={styles.bannerTag}>AI 投注助理</div>
+                <div className={styles.bannerTitle}>添加 Telegram，领专属下注建议</div>
+                <div className={styles.bannerSub}>赛前提醒 · 实时盘口变动 · 风险提示</div>
               </div>
-              <div className={styles.socialPills}>
-                {socialPills.map((pill) => (
-                  <div key={pill.label} className={styles.socialPill}>
-                    <div className={styles.metricLabel}>{pill.label}</div>
-                    <div className={styles.metricValue}>{pill.value}</div>
-                  </div>
-                ))}
+              <a href="https://t.me/" className={styles.primaryCta}>
+                <FiSend size={16} /> 立即添加
+              </a>
+            </div>
+            <div className={styles.promoBanner}>
+              <div>
+                <div className={styles.bannerTag}>每周关注抽奖</div>
+                <div className={styles.bannerTitle}>关注 Facebook，周周送福利</div>
+                <div className={styles.bannerSub}>关注即可参与 · 实名后自动加权</div>
+              </div>
+              <a href="https://facebook.com/" className={styles.secondaryAction}>
+                <FiGift size={16} /> 去关注
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroContent}>
+            <h1 className={styles.heroTitle}>所有比赛 · 一站式可下注</h1>
+            <p className={styles.heroDescription}>
+              聚合主流联赛与电竞盘口，<strong>AI 给出"最有把握"投注建议</strong>，并提示"最划算渠道"。
+            </p>
+          </div>
+          <aside className={styles.aiCard}>
+            <div className={styles.aiCardHeading}>AI 投注助理（Telegram）</div>
+            <p>把你关注的球队加到清单，AI 会根据盘口变动和历史模型，推送合适的下注窗口。</p>
+            <div className={styles.heroActions}>
+              <a href="https://t.me/" className={styles.primaryAction}>
+                <FiBox size={16} /> 添加 Telegram
+              </a>
+              <a href="https://facebook.com/" className={styles.secondaryAction}>
+                <FiLink size={16} /> 关注 Facebook 抽奖
+              </a>
+            </div>
+            <p className={styles.heroFootnote}>* 演示页。请遵循当地法律与 18+ 责任博彩。</p>
+          </aside>
+        </div>
+      </section>
+
+      <main>
+        {/* AI Best Bets */}
+        <BestBetsSection />
+
+        {/* All Matches */}
+        <section id="all" className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              <FiFilter size={20} /> 全部比赛
+            </h2>
+            <label className={styles.favFilter}>
+              <input type="checkbox" /> 只看关注
+            </label>
+          </div>
+
+          {/* Filters */}
+          <div className={styles.filtersCard}>
+            <div className={styles.filtersGrid}>
+              <div>
+                <div className={styles.filterLabel}>运动</div>
+                <select className={styles.filterSelect}>
+                  <option value="">全部</option>
+                  <option>soccer</option>
+                  <option>basketball</option>
+                  <option>esports</option>
+                  <option>tennis</option>
+                </select>
+              </div>
+              <div>
+                <div className={styles.filterLabel}>地区</div>
+                <select className={styles.filterSelect}>
+                  <option value="">全部</option>
+                  <option>TH</option>
+                  <option>ID</option>
+                  <option>VN</option>
+                  <option>MY</option>
+                  <option>BR</option>
+                  <option>MX</option>
+                  <option>AR</option>
+                </select>
+              </div>
+              <div>
+                <div className={styles.filterLabel}>时间</div>
+                <select className={styles.filterSelect}>
+                  <option value="">全部</option>
+                  <option value="today">今天</option>
+                  <option value="24h">24 小时内</option>
+                </select>
+              </div>
+              <div>
+                <div className={styles.filterLabel}>联赛</div>
+                <input className={styles.filterInput} placeholder="THA L1 / Série A / UCL" />
+              </div>
+              <div>
+                <div className={styles.filterLabel}>搜索</div>
+                <input className={styles.filterInput} placeholder="队名/盘口" />
               </div>
             </div>
+          </div>
+
+          {/* Matches Table */}
+          <div className={styles.matchesTable}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>运动</th>
+                  <th>联赛</th>
+                  <th>对阵</th>
+                  <th>主胜</th>
+                  <th>平/让</th>
+                  <th>客胜</th>
+                  <th>AI</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {matches.map((match) => (
+                  <tr key={match.id}>
+                    <td>{new Date(match.ts).toTimeString().slice(0, 5)}</td>
+                    <td>{match.sport}</td>
+                    <td>{match.league}</td>
+                    <td>
+                      <button className={styles.favBtn}>
+                        <FiHeart size={16} />
+                      </button>
+                      <span className={styles.matchTeams}>
+                        {match.home} <span>vs</span> {match.away}
+                      </span>
+                    </td>
+                    <td>{match.odds[0] === '-' ? '-' : Number(match.odds[0]).toFixed(2)}</td>
+                    <td>{match.odds[1] === '-' ? '-' : Number(match.odds[1]).toFixed(2)}</td>
+                    <td>{match.odds[2] === '-' ? '-' : Number(match.odds[2]).toFixed(2)}</td>
+                    <td>{match.ai}</td>
+                    <td>
+                      <button className={styles.dealBtn}>最划算渠道</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SEO Content Hub */}
+        <section id="seo" className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              <FiFileText size={20} /> 内容中心（SEO）
+            </h2>
+            <div className={styles.sectionNote}>支持自动更新到此区域</div>
+          </div>
+          <div className={styles.articlesGrid}>
+            {articles.map((article) => (
+              <a key={article.id} href="#" className={styles.articleCard}>
+                <div className={styles.articleDate}>
+                  {new Date(article.date).toLocaleString()}
+                </div>
+                <div className={styles.articleTitle}>{article.title}</div>
+                <div className={styles.articleTags}>
+                  {article.tag.map((tag) => (
+                    <span key={tag} className={styles.chip}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            ))}
           </div>
         </section>
       </main>
@@ -293,21 +499,19 @@ export default async function Page() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.footerTop}>
-            <div className={styles.logo}>
-              <span className={styles.logoBadge}>AI</span>
-              <span>SmartBet Hub</span>
-              <span className={styles.logoTag}>Beta</span>
-            </div>
-            <div className={styles.footerLinks}>
-              {navItems.map((item) => (
-                <a key={`footer-${item.label}`} className={styles.navLink} href={item.href}>
-                  {item.label}
+            <div className={styles.footerContent}>
+              <div className={styles.footerChips}>
+                <span className={styles.chip}>18+ 责任博彩</span>
+                <span className={styles.chip}>SEA & LATAM</span>
+                <a className={styles.chip} href="https://t.me/">
+                  Telegram
                 </a>
-              ))}
+                <a className={styles.chip} href="https://facebook.com/">
+                  Facebook
+                </a>
+              </div>
+              <div className={styles.disclaimer}>演示页面 · 数据为示例 · 请遵循当地法律</div>
             </div>
-          </div>
-          <div className={styles.disclaimer}>
-            本页面为产品原型，所有数据为示例。请遵循当地法律与责任博彩规范（18+）。
           </div>
         </div>
       </footer>
