@@ -4,9 +4,9 @@ import { SessionProvider } from "next-auth/react"
 import "styles/globals.scss"
 
 export const metadata: Metadata = {
-  title: "next-social-login",
+  title: "BetAIOne",
   description:
-    "An easy authentication way to Github, Google or Facebook using NextAuth.js.",
+    "AI-powered sports betting platform with intelligent predictions and analysis.",
 }
 
 export default async function RootLayout({
