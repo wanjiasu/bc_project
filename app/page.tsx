@@ -349,7 +349,7 @@ export default async function Page() {
         <section id="seo" className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>
-              <FiFileText size={20} /> 内容中心（SEO）
+              <FiFileText size={20} /> 咨讯中心
             </h2>
             <div className={styles.sectionNote}>支持自动更新到此区域</div>
           </div>
