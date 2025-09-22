@@ -22,8 +22,15 @@ export default function PageClient({ children, user }: PageClientProps) {
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false)
   const router = useRouter()
 
+  // 调试日志：查看user对象和userId
+  console.log('PageClient - user object:', user)
+  console.log('PageClient - user.id:', user?.id)
+
   const handleTelegramClick = (e: React.MouseEvent) => {
     e.preventDefault()
+    
+    console.log('handleTelegramClick - user:', user)
+    console.log('handleTelegramClick - user.id:', user?.id)
     
     // 检查用户是否已登录
     if (!user) {
