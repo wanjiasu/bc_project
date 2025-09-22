@@ -30,6 +30,8 @@ export const { auth, handlers } = NextAuth({
     }),
   ],
   secret: authSecret,
+  // 信任主机头，允许动态URL
+  trustHost: true,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -37,7 +39,16 @@ export const { auth, handlers } = NextAuth({
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // 如果是相对URL，使用baseUrl
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // 如果URL的主机与baseUrl相同，允许重定向
+      else if (new URL(url).origin === baseUrl) return url
+      // 否则重定向到baseUrl
+      return baseUrl
+    },
+  },
   events: {
     async signIn({ user, account, profile, isNewUser }) {
       await recordSignInEvent({ user, account, profile, isNewUser })

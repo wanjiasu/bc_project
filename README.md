@@ -45,4 +45,8 @@ pkill -f "pnpm start"
 
 ps aux | grep next
 pkill -9 <pid>
+
+
+PORT=3000 HOSTNAME=0.0.0.0 pm2 start "pnpm start" --name nextjs-app
+pm2 delete nextjs-app
 ```
