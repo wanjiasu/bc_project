@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   FiSend,
   FiBox,
@@ -19,9 +20,19 @@ interface PageClientProps {
 
 export default function PageClient({ children, user }: PageClientProps) {
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false)
+  const router = useRouter()
 
   const handleTelegramClick = (e: React.MouseEvent) => {
     e.preventDefault()
+    
+    // 检查用户是否已登录
+    if (!user) {
+      // 未登录，跳转到登录页面
+      router.push('/login')
+      return
+    }
+    
+    // 已登录，显示Telegram二维码模态框
     setIsTelegramModalOpen(true)
   }
 
@@ -129,7 +140,7 @@ export default function PageClient({ children, user }: PageClientProps) {
       <TelegramQRModal 
         isOpen={isTelegramModalOpen}
         onClose={() => setIsTelegramModalOpen(false)}
-        telegramUrl="https://t.me/betaionetest_bot?start=right"
+        userId={user?.id}
       />
     </>
   )

@@ -9,20 +9,25 @@ import styles from './TelegramQRModal.module.scss'
 interface TelegramQRModalProps {
   isOpen: boolean
   onClose: () => void
+  userId?: string
   telegramUrl?: string
 }
 
 export default function TelegramQRModal({ 
   isOpen, 
   onClose, 
-  telegramUrl = 'https://t.me/betaionetest_bot?start=right' 
+  userId,
+  telegramUrl 
 }: TelegramQRModalProps) {
+  // 动态生成Telegram URL，优先使用传入的telegramUrl，否则使用userId生成
+  const finalTelegramUrl = telegramUrl || 
+    (userId ? `https://t.me/betaionetest_bot?start=${userId}` : 'https://t.me/betaionetest_bot?start=right')
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('')
   const modalRef = useRef<HTMLDivElement>(null)
 
   const generateQRCode = useCallback(async () => {
     try {
-      const dataUrl = await QRCode.toDataURL(telegramUrl, {
+      const dataUrl = await QRCode.toDataURL(finalTelegramUrl, {
         width: 256,
         margin: 2,
         color: {
@@ -34,13 +39,13 @@ export default function TelegramQRModal({
     } catch (error) {
       console.error('生成二维码失败:', error)
     }
-  }, [telegramUrl])
+  }, [finalTelegramUrl])
 
   useEffect(() => {
-    if (isOpen && telegramUrl) {
+    if (isOpen && finalTelegramUrl) {
       generateQRCode()
     }
-  }, [isOpen, telegramUrl, generateQRCode])
+  }, [isOpen, finalTelegramUrl, generateQRCode])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -69,7 +74,7 @@ export default function TelegramQRModal({
   }, [isOpen, onClose])
 
   const handleDirectOpen = () => {
-    window.open(telegramUrl, '_blank')
+    window.open(finalTelegramUrl, '_blank')
   }
 
   if (!isOpen) return null
