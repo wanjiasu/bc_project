@@ -280,7 +280,7 @@ export default async function Page() {
   }))
 
   return (
-    <PageClient>
+    <PageClient user={session?.user ?? null}>
       <main>
         {/* AI Best Bets */}
         <BestBetsSection />

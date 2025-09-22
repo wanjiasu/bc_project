@@ -7,14 +7,17 @@ import {
   FiLink,
   FiGift,
 } from "react-icons/fi"
+import type { User } from "next-auth"
 import TelegramQRModal from "./components/TelegramQRModal"
+import { UserMenuServerWrapper } from "src/components/Header/UserMenuServerWrapper"
 import styles from "./page.module.scss"
 
 interface PageClientProps {
   children: React.ReactNode
+  user: User | null
 }
 
-export default function PageClient({ children }: PageClientProps) {
+export default function PageClient({ children, user }: PageClientProps) {
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false)
 
   const handleTelegramClick = (e: React.MouseEvent) => {
@@ -40,9 +43,7 @@ export default function PageClient({ children }: PageClientProps) {
               <a className={styles.navLink} href="#promos">活动</a>
             </nav>
             <div className={styles.ctaGroup}>
-              <a href="/login" className={styles.primaryCta}>
-                登录
-              </a>
+              <UserMenuServerWrapper user={user} />
             </div>
           </div>
         </header>

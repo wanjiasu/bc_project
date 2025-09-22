@@ -30,18 +30,14 @@ export const { auth, handlers } = NextAuth({
     }),
   ],
   secret: authSecret,
-  cookies: {
-    pkceCodeVerifier: {
-      name: "next-auth.pkce.code_verifier",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 15, // 15 minutes
-      },
-    },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+
   events: {
     async signIn({ user, account, profile, isNewUser }) {
       await recordSignInEvent({ user, account, profile, isNewUser })
