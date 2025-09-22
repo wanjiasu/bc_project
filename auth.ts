@@ -3,7 +3,7 @@ import Facebook from "next-auth/providers/facebook"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 
-import { recordSignInEvent } from "./src/lib/postgres"
+import { recordSignInEvent, getUserByProviderAccount } from "./src/lib/postgres"
 
 const authSecret =
   process.env.AUTH_SECRET ??
@@ -49,13 +49,23 @@ export const { auth, handlers } = NextAuth({
     },
   },
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
+    async jwt({ token, account, user }) {
+      // 在首次登录时，获取用户的UUID并存储在token中
+      if (account && user) {
+        const userRecord = await getUserByProviderAccount(account.provider, account.providerAccountId)
+        if (userRecord) {
+          token.userId = userRecord.id
+          token.email = userRecord.email
+        }
         token.accessToken = account.access_token
       }
       return token
     },
     async session({ session, token }) {
+      // 将用户UUID添加到session中
+      if (token.userId) {
+        session.user.id = token.userId as string
+      }
       return session
     },
     async signIn({ user, account, profile }) {

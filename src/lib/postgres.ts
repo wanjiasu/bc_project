@@ -1,5 +1,6 @@
 import { Pool } from "pg"
 import type { Account, Profile, User } from "next-auth"
+import { randomUUID } from "crypto"
 
 const globalForDb = globalThis as typeof globalThis & {
   __authDbPool?: Pool | null
@@ -29,6 +30,7 @@ const maskConnectionString = (connectionString: string) => {
 
 let pool: Pool | null = null
 let tableEnsured = false
+let usersTableEnsured = false
 let hasLoggedConnectionError = false
 
 function getConnectionString(): string | null {
@@ -119,6 +121,160 @@ async function ensureTableExists(client: Pool) {
   tableEnsured = true
 }
 
+async function ensureUsersTableExists(client: Pool) {
+  if (usersTableEnsured) return
+
+  const createUsersTableSQL = `
+    CREATE TABLE IF NOT EXISTS users (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email TEXT UNIQUE NOT NULL,
+      name TEXT,
+      image TEXT,
+      provider TEXT NOT NULL,
+      provider_account_id TEXT NOT NULL,
+      profile JSONB,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_sign_in_at TIMESTAMPTZ,
+      UNIQUE(provider, provider_account_id)
+    );
+  `
+
+  const createIndexSQL = `
+    CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    CREATE INDEX IF NOT EXISTS idx_users_provider_account ON users(provider, provider_account_id);
+  `
+
+  debugLog("Ensuring users table exists")
+  await client.query(createUsersTableSQL)
+  await client.query(createIndexSQL)
+  debugLog("users table ensured")
+  usersTableEnsured = true
+}
+
+export type UserRecord = {
+  id: string
+  email: string
+  name: string | null
+  image: string | null
+  provider: string
+  provider_account_id: string
+  profile: Record<string, unknown> | null
+  created_at: Date
+  updated_at: Date
+  last_sign_in_at: Date | null
+}
+
+export async function createOrUpdateUser({
+  user,
+  account,
+  profile,
+  isNewUser,
+}: SignInAuditPayload): Promise<UserRecord | null> {
+  const db = getPool()
+  if (!db) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("PostgreSQL connection not configured. Skipping user creation/update.")
+    }
+    return null
+  }
+
+  if (!user?.email || !account?.provider || !account?.providerAccountId) {
+    debugLog("Missing required user information", { email: user?.email, provider: account?.provider, providerAccountId: account?.providerAccountId })
+    return null
+  }
+
+  try {
+    await ensureUsersTableExists(db)
+
+    // 使用 UPSERT 操作：如果用户存在则更新，不存在则创建
+    const upsertQuery = `
+      INSERT INTO users (
+        email,
+        name,
+        image,
+        provider,
+        provider_account_id,
+        profile,
+        last_sign_in_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      ON CONFLICT (provider, provider_account_id)
+      DO UPDATE SET
+        email = EXCLUDED.email,
+        name = EXCLUDED.name,
+        image = EXCLUDED.image,
+        profile = EXCLUDED.profile,
+        updated_at = NOW(),
+        last_sign_in_at = NOW()
+      RETURNING *;
+    `
+
+    const result = await db.query(upsertQuery, [
+      user.email,
+      user.name ?? null,
+      user.image ?? null,
+      account.provider,
+      account.providerAccountId,
+      profile ? JSON.stringify(profile) : null,
+    ])
+
+    const userRecord = result.rows[0] as UserRecord
+    debugLog(isNewUser ? "New user created" : "Existing user updated", {
+      userId: userRecord.id,
+      email: userRecord.email,
+      provider: userRecord.provider,
+    })
+
+    return userRecord
+  } catch (error) {
+    console.error("Failed to create/update user", error)
+    return null
+  }
+}
+
+export async function getUserByProviderAccount(provider: string, providerAccountId: string): Promise<UserRecord | null> {
+  const db = getPool()
+  if (!db) return null
+
+  try {
+    await ensureUsersTableExists(db)
+
+    const query = `
+      SELECT * FROM users 
+      WHERE provider = $1 AND provider_account_id = $2
+    `
+
+    const result = await db.query(query, [provider, providerAccountId])
+    return result.rows[0] as UserRecord || null
+  } catch (error) {
+    console.error("Failed to get user by provider account", error)
+    return null
+  }
+}
+
+export async function getUserByEmail(email: string): Promise<UserRecord | null> {
+  const db = getPool()
+  if (!db) return null
+
+  try {
+    await ensureUsersTableExists(db)
+
+    const query = `
+      SELECT * FROM users 
+      WHERE email = $1
+      ORDER BY created_at DESC
+      LIMIT 1
+    `
+
+    const result = await db.query(query, [email])
+    return result.rows[0] as UserRecord || null
+  } catch (error) {
+    console.error("Failed to get user by email", error)
+    return null
+  }
+}
+
 export type SignInAuditPayload = {
   user: User
   account?: Account | null
@@ -148,8 +304,20 @@ export async function recordSignInEvent({
       providerAccountId: account?.providerAccountId,
       isNewUser,
     })
+    
+    // 确保两个表都存在
     await ensureTableExists(db)
+    await ensureUsersTableExists(db)
 
+    // 首先创建或更新用户记录
+    const userRecord = await createOrUpdateUser({
+      user,
+      account,
+      profile,
+      isNewUser,
+    })
+
+    // 然后记录登录事件，使用新的用户UUID
     const query = `
       INSERT INTO auth_signins (
         user_id,
@@ -165,7 +333,7 @@ export async function recordSignInEvent({
     `
 
     await db.query(query, [
-      user?.id ?? null,
+      userRecord?.id ?? user?.id ?? null, // 优先使用新的UUID，回退到原始user.id
       account?.provider ?? null,
       account?.providerAccountId ?? null,
       user?.email ?? null,
@@ -176,7 +344,10 @@ export async function recordSignInEvent({
     ])
 
     hasLoggedConnectionError = false
-    debugLog("Sign-in record stored successfully")
+    debugLog("Sign-in record stored successfully", {
+      userRecordId: userRecord?.id,
+      originalUserId: user?.id,
+    })
   } catch (error) {
     const shouldLog = debugEnabled || !hasLoggedConnectionError
     if (shouldLog) {
