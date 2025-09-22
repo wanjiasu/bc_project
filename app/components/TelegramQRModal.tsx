@@ -19,17 +19,9 @@ export default function TelegramQRModal({
   userId,
   telegramUrl 
 }: TelegramQRModalProps) {
-  const [copied, setCopied] = useState(false)
-
-  // 调试日志：查看传入的userId
-  console.log('TelegramQRModal - userId:', userId)
-  console.log('TelegramQRModal - telegramUrl:', telegramUrl)
-
   // 动态生成Telegram URL，优先使用传入的telegramUrl，否则使用userId生成
   const finalTelegramUrl = telegramUrl || 
     (userId ? `https://t.me/betaionetest_bot?start=${userId}` : 'https://t.me/betaionetest_bot?start=right')
-  
-  console.log('TelegramQRModal - finalTelegramUrl:', finalTelegramUrl)
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('')
   const modalRef = useRef<HTMLDivElement>(null)
 
